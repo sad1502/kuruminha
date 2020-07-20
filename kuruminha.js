@@ -224,6 +224,7 @@ var fs = require('fs')
     .setFooter('Usado por '+autor);
    logchannel.send(msg)
     }
+  })
     // fim limpar
 
   //inicio log
@@ -282,4 +283,4 @@ client.on('guildBanRemove', function(guild, user) {
 })
 //fim log
   
-  client.login(process.env.token);
+  client.login('process.env.token');
