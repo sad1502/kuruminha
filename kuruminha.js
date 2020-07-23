@@ -534,5 +534,4 @@ client.on('guildBanRemove', function(guild, user) {
 })
 //fim log
 
-  client.login('NzI1OTI1MTYwMjEyNzU4NTg5.XwnrLw.Mjkhwxnb5DJ7-gtxyPck91HqBlY')
-//  client.login(process.env.token);
+client.login(process.env.token);
