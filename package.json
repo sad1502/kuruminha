@@ -8,7 +8,8 @@
     "fetch": "1.1.0",
     "fs": "0.0.1-security",
     "ms": "2.1.2",
-    "edit-json-file": "1.4.0"
+    "edit-json-file": "1.4.0",
+    "dabi-images": "2.7.5"
 
   },
   "devDependencies": {},
