@@ -56,15 +56,28 @@ const file = editJsonFile(`${__dirname}/leaderboard.json`);
       var msado = ms(''+tempo_mutado)
 
       member.roles.add(mrole)
-      message.reply("**O Usúario** <@"+member+"> **foi mutado temporariamente, O Usúario será desmutado em "+msado+"ms**")
+      message.reply("**O Usúario** <@"+member+"> **foi mutado temporariamente, O Usúario será desmutado em "+args[2]+"**")
 
 
       var mutetimeout = setTimeout(function(){
         member.roles.remove(mrole);
-        message.channel.send("**O Usúario <@"+member+"> foi desmutado.**");
       }, msado);    
     }
     // mute temporario
+    function desmtr() {
+      clearInterval(mutetimeout)
+    }
+          // desmutar
+
+          if (cmd === 'desmutar') {
+            if (!member) return message.reply("**Você não mencionou ninguém para mutar, ou a pessoa não está no servidor!**")
+            if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
+            if (!member.roles.cache.find(r => r.name === "mutado")) return message.reply("**Esse usúario não está mutado!**")
+            member.roles.remove(mrole)
+            message.reply("**O Usúario** <@"+member+"> **foi desmutado com sucesso!**")
+            desmtr()
+          }
+          // desmutar
 
     // pra quando eu pedir cargo pro insano e ele tiver off
     if (cmd === 'role') {
@@ -165,20 +178,6 @@ const file = editJsonFile(`${__dirname}/leaderboard.json`);
       // fim covid
 
 
-
-      // desmutar
-
-      if (cmd === 'desmutar') {
-        if (!member) return message.reply("**Você não mencionou ninguém para mutar, ou a pessoa não está no servidor!**")
-        if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
-        if (!member.roles.cache.find(r => r.name === "mutado")) return message.reply("**Esse usúario não está mutado!**")
-        member.roles.remove(mrole)
-        message.reply("**O Usúario** <@"+member+"> **foi desmutado com sucesso!**")
-        clearInterval(mutetimeout)
-      }
-      // desmutar
-
-
       // funnação fun
       if (cmd === 'kiss') {
         if (!member) return message.reply("**Você não mencionou ninguem, ou não pude encontrar a pessoa mencionada no servidor.**")
@@ -258,6 +257,17 @@ const file = editJsonFile(`${__dirname}/leaderboard.json`);
     } */
     // fim comando de trocar o nome do asuma
 
+    // backup leaderboard json pq n sei como salvar em algum lugar kk
+    if (cmd === 'backup') {
+      if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
+      message.author.send("**Backup do Arquivo Leaderboard.json**", {
+        files: [
+          "./leaderboard.json"
+        ]
+      });
+    }
+    // backup leaderboard json pq n sei como salvar em algum lugar kk
+
     
     // comando de pergunta
     const respostas = ['Claro que sim.','Com toda a certeza!','fap news','o zé sabe mt bem disso ai vei, pode perguntar pra ele','porra claro né vei mds ta óbvio isso ai bixo','tu é gay mano???','nada aver irmão','talvez vei','acho q ss mano','pergunta pro insano vei sla','pergunta pro asuma ou pro insano vei, os 2 tao sempre debatendo sobre isso por ai, eles devem saber :v','kk n sei n vei o matata deve saber','nn vei vsf kk','falso','true','^']
@@ -330,10 +340,59 @@ const file = editJsonFile(`${__dirname}/leaderboard.json`);
 
     //nsfw parte
 
+    if (cmd === 'boobs') {
+      if (!message.channel.nsfw) return message.reply("**Esse canal não é um canal NSFW, para usar esse comando, ultilize algum canal NSFW.**")
+      fetch(`https://love-you.xyz/api/v2/boobs`).then(response=>response.json()) 
+      .then(data=>{ 
+    const msg = new Discord.MessageEmbed()
+    .setColor(0x4e42f5)
+    .setTitle('Abrir Link')
+    .setURL(data.url)
+    .setDescription('Seios')
+    .setImage(data.url)
+    .setTimestamp()
+    .setFooter(message.author.username);
+    message.reply(msg)
+      });
+    }
+
+    if (cmd === 'porngif') {
+      if (!message.channel.nsfw) return message.reply("**Esse canal não é um canal NSFW, para usar esse comando, ultilize algum canal NSFW.**")
+      fetch(`https://love-you.xyz/api/v2/gif`).then(response=>response.json()) 
+      .then(data=>{ 
+    const msg = new Discord.MessageEmbed()
+    .setColor(0x4e42f5)
+    .setTitle('Abrir Link')
+    .setURL(data.url)
+    .setDescription('GIF Pornô')
+    .setImage(data.url)
+    .setTimestamp()
+    .setFooter(message.author.username);
+    message.reply(msg)
+      });
+    }
+
+    if (cmd === 'anal') {
+      if (!message.channel.nsfw) return message.reply("**Esse canal não é um canal NSFW, para usar esse comando, ultilize algum canal NSFW.**")
+      fetch(`https://love-you.xyz/api/v2/anal`).then(response=>response.json()) 
+      .then(data=>{ 
+    const msg = new Discord.MessageEmbed()
+    .setColor(0x4e42f5)
+    .setTitle('Abrir Link')
+    .setURL(data.url)
+    .setDescription('Anal')
+    .setImage(data.url)
+    .setTimestamp()
+    .setFooter(message.author.username);
+    message.reply(msg)
+      });
+    }
+
 
    //hentai
 
    if (cmd === 'hentai') {
+    if (!message.channel.nsfw) return message.reply("**Esse canal não é um canal NSFW, para usar esse comando, ultilize algum canal NSFW.**")
     DabiClient.nsfw.hentai.ass().then(json => {
       message.reply(json.url)
   }).catch(error => {
@@ -455,8 +514,6 @@ const file = editJsonFile(`${__dirname}/leaderboard.json`);
 
     //inicio comando help
     if (cmd === 'help') {
-
-
       if (args[1] == '1') { 
         const msg = new Discord.MessageEmbed()
         .setColor(0xEE2A00)
@@ -477,12 +534,20 @@ const file = editJsonFile(`${__dirname}/leaderboard.json`);
 
       if (args[1] == '2') { 
         const msg = new Discord.MessageEmbed()
-        .setColor(0xEE2A00)
+        .setColor(0xeb34bd)
         .setTitle('**NSFW**')
         .setThumbnail(message.author.displayAvatarURL())
         .setDescription('Comandos da Categoria NSFW')
+        .addField('ㅤ','ㅤ')
+        .addField('Hentai','ㅤ')
+        .addField('hentai','Envia uma Imagem de Hentai. | **/hentai**')
         .addField('hentai-gif','Envia um GIF de Hentai. | **/hentai-gif**')
         .addField('hentai-pussy','Envia uma Imagem de uma vagina aleatória. | **/hentai-pussy**')
+        .addField('ㅤ','ㅤ')
+        .addField('Pornô','ㅤ')
+        .addField('porngif','Envia um GIF Pornô. | **/porngif**')
+        .addField('boobs','Envia uma Imagem de Seios. | **/boobs**')
+        .addField('anal','Envia uma Imagem de Anal. | **/anal**')
         .setTimestamp()
         .setFooter('Kuruminha');
         message.reply(msg)
@@ -609,16 +674,6 @@ const file = editJsonFile(`${__dirname}/leaderboard.json`);
 
   //inicio log
   const kuruma = 'http://archive-media-2.nyafuu.org/bant/image/1506/61/1506613859653.png';
-  client.on('channelCreate',  function(channel) {
-    var logchannel = channel.guild.channels.cache.find(channels => channels.name == 'log');
-    const msg = new Discord.MessageEmbed()
-    .setColor(0x8c03fc)
-    .setAuthor('Canal Criado')
-    .setDescription(channel)
-    .setTimestamp()
-    .setFooter('Kuruminha', kuruma);
-   logchannel.send(msg)
-})
   client.on('messageDelete', message => {
     var logchannel = message.guild.channels.cache.find(channels => channels.name == 'log');
     if (message.author.bot) return;
