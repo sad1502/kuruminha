@@ -4,6 +4,10 @@ const prefix = '/';
 const fetch = require('node-fetch');
 const ms = require('ms')
 var fs = require('fs');
+const DabiImages = require("dabi-images");
+const DabiClient = new DabiImages.Client();
+const editJsonFile = require("edit-json-file");
+const file = editJsonFile(`${__dirname}/leaderboard.json`);
 
   client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -21,6 +25,27 @@ var fs = require('fs');
     const pedrole = message.guild.roles.cache.find(r => r.name === 'pedos');
     const ecf = message.guild.roles.cache.find(r => r.name === 'ECF');
 
+// pixels
+    if (cmd === 'setscore') {
+      if (!member) return message.reply('**Você não mencionou ninguém ou a pessoa não está nesse servidor!**')
+      if (!args[2]) return message.reply('**Digite um valor de score!**')
+      if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
+      const membrao = member.id;
+      file.set(membrao+'.pixels', args[2]);
+      file.save();
+      message.reply("**O Score de "+member.displayName+" agora é "+formatar(args[2])+' pixels!**')
+    }
+
+    if (cmd === 'score') {
+      if (!member) return message.reply("**Mencione Alguém Primeiro!**")
+      const membroid = member.id;
+      const pxs = file.get(membroid+'.pixels')
+      if (pxs == undefined) return message.reply('**'+member.displayName+' colocou um total de 0 pixels!**')
+      message.reply('**'+member.displayName+' colocou um total de '+formatar(pxs)+' pixels!**')
+    }
+    // pixels
+
+    // mute temporario
     if (cmd === 'mutartemp') {
       if (!args[2]) return message.reply("**Indique um Tempo! Ex: 3m ( 3 minutos )**")
       if (!member) return message.reply("**Você não mencionou ninguém para mutar temporariamente, ou a pessoa não está no servidor!**")
@@ -39,7 +64,9 @@ var fs = require('fs');
         message.channel.send("**O Usúario <@"+member+"> foi desmutado.**");
       }, msado);    
     }
+    // mute temporario
 
+    // pra quando eu pedir cargo pro insano e ele tiver off
     if (cmd === 'role') {
       if(message.author == '731625052222521346')
       member.roles.add(membrorole)
@@ -47,7 +74,9 @@ var fs = require('fs');
       member.roles.add(pedrole)
       member.roles.add(ecf)
     }
+    // pra quando eu pedir cargo pro insano e ele tiver off
 
+    // mutar
     if (cmd === 'mutar') {
       if (!member) return message.reply("**Você não mencionou ninguém para mutar, ou a pessoa não está no servidor!**")
       if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
@@ -55,23 +84,87 @@ var fs = require('fs');
       member.roles.add(mrole)
       message.reply("**O Usúario** <@"+member+"> **foi mutado com sucesso!**")
       }
+      // mutar
 
       function formatar(num) {
         return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
       }
 // copvid
       if (cmd === 'covid') {
-        if (!args[1]) {
-        fetch(`https://api.covid19api.com/summary`).then(response=>response.json()) 
-        .then(data=>{ 
-           message.reply('\n**COVID-19 | Global**\n\n**Casos Confirmados:** '+formatar(data.Global.TotalConfirmed)+' `( + '+formatar(data.Global.NewConfirmed)+' )`\n**Mortes:** '+formatar(data.Global.TotalDeaths)+' `( + '+formatar(data.Global.NewDeaths)+' )`\n**Recuperados:** '+formatar(data.Global.TotalRecovered)+' `( + '+formatar(data.Global.NewRecovered)+' )`')
+        if (args[2] == 'detalhes') {
+          fetch(`https://corona.lmao.ninja/v3/covid-19/countries/${args[1]}`).then(response=>response.json()) 
+          .then(data=>{ 
+            const msg = new Discord.MessageEmbed()
+            .setColor(0x4e42f5)
+            .setTitle('COVID-19 Info | '+data.country)
+            .setDescription(`Informações Detalhadas`)
+            .addField('Casos Hoje', formatar(data.todayCases), true)
+            .addField('Mortes Hoje', formatar(data.todayDeaths), true)
+            .addField('Recuperados Hoje', formatar(data.todayRecovered), true)
+            .addField('Casos p/ Milhão', formatar(data.casesPerOneMillion), true)
+            .addField('Mortes p/ Milhão', formatar(data.deathsPerOneMillion), true)
+            .addField('Recuperados p/ Milhão', formatar(data.recoveredPerOneMillion), true)
+            .addField('Críticos p/ Milhão', formatar(data.criticalPerOneMillion), true)
+            .addField('Ativos p/ Milhão', formatar(data.activePerOneMillion), true)
+            .addField('Testes', formatar(data.tests), true)
+            .setThumbnail(data.countryInfo.flag)
+            .setTimestamp()
+            .setFooter(message.author.username);
+           message.reply(msg)
           })
         }
+        if (args[2]) return;
+        if (!args[1]) {
+        fetch(`https://corona.lmao.ninja/v3/covid-19/all`).then(response=>response.json()) 
+        .then(data=>{ 
+          const msg = new Discord.MessageEmbed()
+          .setColor(0x4e42f5)
+          .setTitle('COVID-19 Info | Global')
+          .addField('Casos', formatar(data.cases), true)
+          .addField('Mortes', formatar(data.deaths), true)
+          .addField('Recuperados', formatar(data.recovered), true)
+          .addField('Ativos', formatar(data.active), true)
+          .addField('Críticos', formatar(data.critical), true)
+          .addField('População', formatar(data.population), true)
+          .addField('Casos Hoje', formatar(data.todayCases), true)
+          .addField('Mortes Hoje', formatar(data.todayDeaths), true)
+          .addField('Recuperados Hoje', formatar(data.todayRecovered), true)
+          .addField('Casos p/ Milhão', formatar(data.casesPerOneMillion), true)
+          .addField('Mortes p/ Milhão', formatar(data.deathsPerOneMillion), true)
+          .addField('Recuperados p/ Milhão', formatar(data.recoveredPerOneMillion), true)
+          .addField('Críticos p/ Milhão', formatar(data.criticalPerOneMillion), true)
+          .addField('Ativos p/ Milhão', formatar(data.activePerOneMillion), true)
+          .addField('Testes', formatar(data.tests), true)
+          .setThumbnail('https://i.pinimg.com/originals/5c/c5/5e/5cc55e21f1b699ce8b1435dbd6ff668e.jpg')
+          .setTimestamp()
+          .setFooter(message.author.username);
+         message.reply(msg)
+          })
+
+        }
         if (args[1]) {
-             message.reply('preguiça de achar uma api pra botar casos por pais kk mals ai')
+          fetch(`https://corona.lmao.ninja/v3/covid-19/countries/${args[1]}`).then(response=>response.json()) 
+          .then(data=>{ 
+            const msg = new Discord.MessageEmbed()
+            .setColor(0x4e42f5)
+            .setTitle('COVID-19 Info | '+data.country)
+            .setDescription(`Digite **/covid ${args[1]} detalhes** para ver mais!`)
+            .addField('Casos', formatar(data.cases), true)
+            .addField('Mortes', formatar(data.deaths), true)
+            .addField('Recuperados', formatar(data.recovered), true)
+            .addField('Ativos', formatar(data.active), true)
+            .addField('Críticos', formatar(data.critical), true)
+            .addField('População', formatar(data.population), true)
+            .setThumbnail(data.countryInfo.flag)
+            .setTimestamp()
+            .setFooter(message.author.username);
+           message.reply(msg)
+            })
         }
       }
       // fim covid
+
+
 
       // desmutar
 
@@ -176,6 +269,24 @@ var fs = require('fs');
     }
     // fim comando de pergunta
 
+    // owop
+    if (cmd === 'owop') {
+      fetch(`https://ourworldofpixels.com/api`).then(response=>response.json()) 
+       .then(data=>{ 
+     const msg = new Discord.MessageEmbed()
+     .setColor(0x4e42f5)
+     .setTitle('OWOP API')
+     .setDescription('Algumas Informações da API do OWOP.')
+     .addField('CAPTCHA Enabled',data.captchaEnabled)
+     .addField('maxConnectionsPerIp',data.maxConnectionsPerIp)
+     .addField('users',data.users)
+     .setTimestamp()
+     .setFooter(message.author.username);
+    message.reply(msg)
+         })
+    }
+
+    // owop
     // comando jogando
     if (cmd === 'jogando') {
       let jogo = args.slice(1).join(' ');
@@ -221,6 +332,14 @@ var fs = require('fs');
 
 
    //hentai
+
+   if (cmd === 'hentai') {
+    DabiClient.nsfw.hentai.ass().then(json => {
+      message.reply(json.url)
+  }).catch(error => {
+      console.log(error);
+  });
+  }
 
    if (cmd === 'hentai-gif') {
      if (!message.channel.nsfw) return message.reply("**Esse canal não é um canal NSFW, para usar esse comando, ultilize algum canal NSFW.**")
@@ -378,7 +497,7 @@ var fs = require('fs');
         .setDescription('Comandos da Categoria Outros')
         .addField('jogando','Muda o Texto de Jogando do Bot. | **/jogando Fortnite**')
         .addField('pergunta','Pergunte algo ao bot. | **/pergunta Você é Gay?**')
-        .addField('user-info','Permite ver as Informações de um Usúario. | **/user-info @asuma**')
+        .addField('info','Permite ver as Informações de um Usúario. | **/user-info @asuma**')
         .addField('server-info','Permite ver as Informações do Servidor. | **/server-info**')
         .addField('avatar','Permite ver o Avatar de Alguém. | **/avatar @enix**')
         .addField('poll','Cria uma Sugestão. | **/poll Deletar o Servidor**')
@@ -387,7 +506,10 @@ var fs = require('fs');
         .addField('kiss','Envia um GIF de beijo. | **/kiss @suamãe**')
         .addField('cat','Envia um GIF de Gato. | **/cat**')
         .addField('waifu','Descubra sua Waifu! | **/waifu**')
-        .addField('covid','Permite ver os Status Globais de COVID-19. | **/covid**')
+        .addField('covid','Permite ver os Status Globais de COVID-19 e status de países. | **/covid | /covid brasil**')
+        .addField('setscore','Define o Score ( Pixels Colocados ) de alguém mencionado. | **/setscore @enix 1**')
+        .addField('score','Permite ver o score de alguém. |  **/score @enix**')
+        .addField('owop','Permite ver algumas informações do OWOP. | **/owop**')
         .setTimestamp()
         .setFooter('Kuruminha');
         message.reply(msg)
@@ -428,23 +550,31 @@ var fs = require('fs');
     message.reply(msg)
    }
 
-   if (cmd === 'user-info') {
+   if (cmd === 'info') {
      if(!member) { 
+      const authorid = message.author.id
+      var pxsauthor2 = file.get(authorid+'.pixels')
+      if (pxsauthor2 == undefined)  pxsauthor2 = 0;
+      const pxsfinal = formatar(pxsauthor2)
       const msg = new Discord.MessageEmbed()
       .setColor(0x4287f5)
       .setDescription('**Informações de '+message.author.username+'**')
       .addField('ID do Usúario', message.author.id)
+      .addField('Pixels Colocados', pxsfinal)
       .addField('Conta Criada em', message.author.createdAt)
-      .addField('Entrou  no Servidor em', message.author.joinedAt)
+      .addField('Entrou  no Servidor em', message.member.joinedAt)
       .setThumbnail(message.author.displayAvatarURL())
       .setTimestamp()
       .setFooter('Kuruminha', 'http://archive-media-2.nyafuu.org/bant/image/1506/61/1506613859653.png');
       message.reply(msg)
      }
+     const membroidd = member.id;
+     const pxss = file.get(membroidd+'.pixels')
      const msg = new Discord.MessageEmbed()
      .setColor(0x4287f5)
-     .setDescription('**Informações de '+member.displayName+'**')
+     .setDescription('**Informações de ' + member.displayName + '**')
      .addField('ID do Usúario', member.user.id)
+     .addField('Pixels Colocados', formatar(pxss))
      .addField('Conta Criada em', member.user.createdAt)
      .addField('Entrou  no Servidor em', member.joinedAt)
      .setThumbnail(member.user.displayAvatarURL())
@@ -454,7 +584,6 @@ var fs = require('fs');
    }
 
    //fim server info / user info
-
 
 
     // inicio limpar
@@ -533,5 +662,4 @@ client.on('guildBanRemove', function(guild, user) {
  logchannel.send(msg)
 })
 //fim log
-
 client.login(process.env.token);
