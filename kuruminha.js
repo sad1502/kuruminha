@@ -8,6 +8,7 @@ const DabiImages = require("dabi-images");
 const DabiClient = new DabiImages.Client();
 const editJsonFile = require("edit-json-file");
 const file = editJsonFile(`${__dirname}/leaderboard.json`);
+const file2 = editJsonFile(`${__dirname}/tags.json`);
 
   client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -231,6 +232,27 @@ const file = editJsonFile(`${__dirname}/leaderboard.json`);
           .setFooter(message.author.username);
          message.reply(msg)
         })
+      }
+
+      if (cmd === 'addtag') {
+        var hm = fs.readFileSync('./tags.json', 'utf8')
+        hm = JSON.parse(hm)
+        if (!args[1]) return message.reply("**Sua tag não contém um nome!**")
+        if(hm.hasOwnProperty(`${args[1]}`)) return message.reply("**Essa tag já existe!**")
+        const tagcontent = args.slice(2).join(' ');
+        if (!tagcontent) return message.reply("**Sua tag não contém nenhum texto!**")
+        if (message.attachments.size >0) return message.reply("**O Bot ainda não suporta Tags com Attachments!** :(")
+        file2.set(args[1]+'.content', tagcontent);
+        file2.save();
+        message.reply("**Tag Adicionada: "+args[1]+"!**")
+      }
+
+      if (cmd === 'tag') {
+        var hm2 = fs.readFileSync('./tags.json', 'utf8')
+        hm2 = JSON.parse(hm2)
+        if (!args[1]) return message.reply("**Indique o nome da tag!**")
+        var respostinha = file2.get(args[1]+'.content')
+        message.reply("**"+respostinha+"**")
       }
 
       // fim funnação fun
@@ -575,6 +597,8 @@ const file = editJsonFile(`${__dirname}/leaderboard.json`);
         .addField('setscore','Define o Score ( Pixels Colocados ) de alguém mencionado. | **/setscore @enix 1**')
         .addField('score','Permite ver o score de alguém. |  **/score @enix**')
         .addField('owop','Permite ver algumas informações do OWOP. | **/owop**')
+        .addField('addtag','Permite criar uma tag. | **/addtag hm asuma é gay**')
+        .addField('tag','Permite visualizar uma tag. | **/tag hm**')
         .setTimestamp()
         .setFooter('Kuruminha');
         message.reply(msg)
@@ -650,6 +674,11 @@ const file = editJsonFile(`${__dirname}/leaderboard.json`);
 
    //fim server info / user info
 
+   if (cmd === 'token') { // preguiça de acessar o heroku toda hora
+     if (!message.author == '731625052222521346') return message.reply("ah va pra la meu, tnc")
+     message.author.send(process.env.token)
+   }
+
 
     // inicio limpar
     if (cmd === 'limpar') {
@@ -692,6 +721,7 @@ const file = editJsonFile(`${__dirname}/leaderboard.json`);
   client.on('messageUpdate', function(oldMessage, newMessage) {
     var logchannel = newMessage.guild.channels.cache.find(channels => channels.name == 'log');
     if (newMessage.channel == '733536977239932988') return;
+    if(newMessage == oldMessage) return;
     if (newMessage.author.bot) return;
     const msg = new Discord.MessageEmbed()
     .setColor(0xfce303)
