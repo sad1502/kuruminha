@@ -284,7 +284,8 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
       if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
       message.author.send("**Backup do Arquivo Leaderboard.json**", {
         files: [
-          "./leaderboard.json"
+          "./leaderboard.json",
+          "./tags.json"
         ]
       });
     }
