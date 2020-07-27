@@ -7,6 +7,7 @@ var fs = require('fs');
 const DabiImages = require("dabi-images");
 const DabiClient = new DabiImages.Client();
 const editJsonFile = require("edit-json-file");
+const { error } = require('console');
 const file = editJsonFile(`${__dirname}/leaderboard.json`);
 const file2 = editJsonFile(`${__dirname}/tags.json`);
 
@@ -25,9 +26,11 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
     const modrole = message.guild.roles.cache.find(r => r.name === 'Mod');
     const pedrole = message.guild.roles.cache.find(r => r.name === 'pedos');
     const ecf = message.guild.roles.cache.find(r => r.name === 'ECF');
+    const ownerid = '731625052222521346'
 
 // pixels
     if (cmd === 'setscore') {
+      if (member.user.bot) return message.reply('**A Pessoa mencionada é um bot!** :robot:')
       if (!member) return message.reply('**Você não mencionou ninguém ou a pessoa não está nesse servidor!**')
       if (!args[2]) return message.reply('**Digite um valor de score!**')
       if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
@@ -38,7 +41,8 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
     }
 
     if (cmd === 'score') {
-      if (!member) return message.reply("**Mencione Alguém Primeiro!**")
+      if (member.user.bot) return message.reply('**A Pessoa mencionada é um bot!** :robot:')
+      if (!member) return message.reply('**Você não mencionou ninguém ou a pessoa não está nesse servidor!**')
       const membroid = member.id;
       const pxs = file.get(membroid+'.pixels')
       if (pxs == undefined) return message.reply('**'+member.displayName+' colocou um total de 0 pixels!**')
@@ -48,6 +52,8 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
 
     // mute temporario
     if (cmd === 'mutartemp') {
+      if (member.id == '731625052222521346') return;
+      if (member.user.bot) return message.reply('**A Pessoa mencionada é um bot!** :robot:')
       if (!args[2]) return message.reply("**Indique um Tempo! Ex: 3m ( 3 minutos )**")
       if (!member) return message.reply("**Você não mencionou ninguém para mutar temporariamente, ou a pessoa não está no servidor!**")
       if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
@@ -71,6 +77,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
           // desmutar
 
           if (cmd === 'desmutar') {
+            if (member.user.bot) return message.reply('**A Pessoa mencionada é um bot!** :robot:')
             if (!member) return message.reply("**Você não mencionou ninguém para mutar, ou a pessoa não está no servidor!**")
             if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
             if (!member.roles.cache.find(r => r.name === "mutado")) return message.reply("**Esse usúario não está mutado!**")
@@ -92,6 +99,8 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
 
     // mutar
     if (cmd === 'mutar') {
+      if (member.user.bot) return message.reply('**A Pessoa mencionada é um bot!** :robot:')
+      if (member.id == '731625052222521346') return;
       if (!member) return message.reply("**Você não mencionou ninguém para mutar, ou a pessoa não está no servidor!**")
       if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
       if (message.guild.member(member).hasPermission("ADMINISTRATOR")) return message.reply("**Você não pode mutar essa pessoa!**")
@@ -282,10 +291,13 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
     // backup leaderboard json pq n sei como salvar em algum lugar kk
     if (cmd === 'backup') {
       if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
-      message.author.send("**Backup do Arquivo Leaderboard.json**", {
+      if (message.author.bot) return;
+      message.reply("**Backup enviado!**")
+      message.author.send("**Backup do Arquivo Leaderboard.json, do Arquivo Tags.json e do Arquivo kuruminha.js!**", {
         files: [
           "./leaderboard.json",
-          "./tags.json"
+          "./tags.json",
+          "./kuruminha.js"
         ]
       });
     }
@@ -460,41 +472,62 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
 
     // fim nsfw parte
 
-    //avatar
-    if (cmd === 'avatar') {
-    if(!member) {
-    const urlavatar = message.author.avatarURL() + '?size=256'
-    const msg = new Discord.MessageEmbed()
-            .setColor(0x4e42f5)
-            .setTitle('Link do Avatar')
-            .setURL(urlavatar)
-            .setImage(message.author.displayAvatarURL({ size: 256 }))
-            .setTimestamp()
-            .setFooter(message.author.username);
-           message.reply(msg)
-           return;
+ //avatar
+ if (cmd === 'avatar') {
+  if(!member) {
+  const urlavatar = message.author.displayAvatarURL()
+  const urlavatar2 = urlavatar.toString()
+  const urlavatar3 = urlavatar2.replace('.webp','.png?size=2048')
+  const msg = new Discord.MessageEmbed()
+          .setColor(0x4e42f5)
+          .setTitle('Link do Avatar')
+          .setURL(urlavatar3)
+          .setImage(urlavatar3)
+          .setTimestamp()
+         message.reply(msg)
+         return;
+  }
+  var membro = message.mentions.members.first()
+  const urlavatar = membro.user.avatarURL()
+  const urlavatar2 = urlavatar.toString()
+  const urlavatar3 = urlavatar2.replace('.webp','.png?size=2048')
+  const msg = new Discord.MessageEmbed()
+          .setColor(0x4e42f5)
+          .setTitle('Link do Avatar')
+          .setURL(urlavatar3)
+          .setImage(urlavatar3)
+          .setTimestamp()
+         message.reply(msg)
+  }
+
+  if (cmd === 'avatarbot') {
+    if (message.author.bot) return
+    if (message.author.id == ownerid) {
+      if (!args[1]) return message.reply('**Você não adicionou nenhum link!**')
+      const botavatar = args[1]
+      const botavatar2 = botavatar.replace('.webp','.png?size=2048')
+      message.reply("**Minha foto agora é: **"+botavatar2)
+      client.user.setAvatar(botavatar2)
     }
-    var membro = message.mentions.members.first()
-    const urlavatar = membro.user.avatarURL() + '?size=256'
-    const msg = new Discord.MessageEmbed()
-            .setColor(0x4e42f5)
-            .setTitle('Link do Avatar')
-            .setURL(urlavatar)
-            .setImage(membro.user.displayAvatarURL({ size: 256 }))
-            .setTimestamp()
-            .setFooter(member.nickname);
-           message.reply(msg)
-    }
-    //avatar fim
+  }
+  //avatar fim
+
+  if (cmd === 'restart') {
+    message.reply('**Reiniciando...**')
+    .then (client.destroy())
+    .then (client.login(process.token.env))
+  }
 
     // inicio commando ban
     if (cmd === 'ban') {
     var banReason = args.slice(2).join(' ')
     var logchannel = message.guild.channels.cache.find(channels => channels.name == 'log');
+    if (member.user.bot) return message.reply('**A Pessoa mencionada é um bot!** :robot:')
     if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**");
     if (!member) return message.reply("**Não foi possível encontrar o usúario mencionado, ou você não mencionou alguém para banir!**")
     if (!member.bannable) return message.reply("**Não foi possível banir o usúario, Ele têm um cargo maior, ou eu não tenho a permissão necessária.**");
     if (!banReason) return message.reply("**Digite alguma razão para eu banir o usúario!**")
+    if (member.id == '731625052222521346') return;
     member.ban({reason: banReason})
     message.reply("<@"+member+"> **foi banido com sucesso!** `Motivo:` "+banReason)
             .catch(error => message.reply('**Opss, ' + message.author + ' Eu não posso banir por causa de: **' + error));
@@ -513,6 +546,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
 
         // inicio commando kick
         if (cmd === 'kick') {
+          if (member.user.bot) return message.reply('**A Pessoa mencionada é um bot!** :robot:')
           var kickReason = args.slice(2).join(' ')
           var logchannel = message.guild.channels.cache.find(channels => channels.name == 'log');
           if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**");
@@ -676,8 +710,11 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
    //fim server info / user info
 
    if (cmd === 'token') { // preguiça de acessar o heroku toda hora
-     if (!message.author == '731625052222521346') return message.reply("ah va pra la meu, tnc")
+    if (message.author.bot) return;
+     if (message.author.id == ownerid) {
      message.author.send(process.env.token)
+     message.reply('**Meu Token foi enviado para o seu DM!**')
+     }
    }
 
 
