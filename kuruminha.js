@@ -1,4 +1,4 @@
-const Discord = require('discord.js');
+﻿const Discord = require('discord.js');
 const client = new Discord.Client({ disableEveryone: true });
 const prefix = '/';
 const fetch = require('node-fetch');
@@ -48,6 +48,79 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
       if (pxs == undefined) return message.reply('**'+member.displayName+' colocou um total de 0 pixels!**')
       message.reply('**'+member.displayName+' colocou um total de '+formatar(pxs)+' pixels!**')
     }
+
+     if (cmd === 'comparar') {
+      if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
+      if (message.author.bot) return;
+       const Attach = message.attachments.array()
+       const PNG = require('pngjs').PNG;
+       if (!Attach[0]) return message.reply("**Envie uma Imagem para eu comparar com a MegaBR!**")
+
+       // download imagem | https://www.npmjs.com/package/image-downloader
+       const download = require('image-downloader')
+       const options = {
+         url: Attach[0].url,
+         dest: './atual.png'
+       }
+        
+       download.image(options)
+         .then(({ filename }) => {
+           console.log('Saved')
+         })
+         .catch((err) => console.error(err))
+      // download imagem
+      setTimeout(() => {
+      const pixelmatch = require('pixelmatch');
+      const atual = PNG.sync.read(fs.readFileSync('./atual.png'));
+      const megabr = PNG.sync.read(fs.readFileSync('./megabr.png'));
+      const {width, height} = atual;
+      const diff = new PNG({width, height});
+      const difference = pixelmatch(atual.data, megabr.data, diff.data, width, height, {threshold: 0.1});
+      var tamanho = megabr.height * megabr.width
+      var progtoda = tamanho - difference;
+      var porcentagem = progtoda*100/tamanho.toFixed(1)
+      var porcentagemverdadeira = porcentagem.toFixed(2)
+      var progresso = '**'+formatar(progtoda)+" / "+ formatar(tamanho)+" | "+formatar(difference)+" erros | "+porcentagemverdadeira + "% Completo** "
+      fs.writeFileSync('resultado_diff.png', PNG.sync.write(diff));
+      var frase = 'hm' // simbolo de progresso / regresso / neutro
+      var progresso_que_tivemos = 0 // numero de pixels que tivemos de progresso ou regresso
+      var detalhe_bem_inutil = '/ ' //simbolo tipo +, -, /.
+      var quem_ganhou_o_round = ' :flag_br:' //bandeira de quem ganhou o round.
+      var prog_channel = message.guild.channels.cache.find(channels => channels.name == '📊・megabr');
+     
+      var cu = fs.readFileSync('./stats/ultimos_erros.txt', 'utf-8')
+      if (cu > difference) { // teve progresso
+        frase = ':chart_with_upwards_trend:'
+        progresso_que_tivemos = cu-difference
+        detalhe_bem_inutil = '- '
+        quem_ganhou_o_round = ' :flag_br:'
+      }
+  
+      if (cu < difference) { // teve regresso
+        frase = ':chart_with_downwards_trend:'
+        progresso_que_tivemos = difference-cu
+        detalhe_bem_inutil = '+ '
+        quem_ganhou_o_round = ' :flag_fi:'
+      }
+  
+      if (cu == difference) { // neutro
+        frase =':handshake:'
+        detalhe_bem_inutil = ''
+        quem_ganhou_o_round = ' :flag_white:'
+      }
+
+      fs.writeFileSync('./stats/ultimos_erros.txt', difference)
+
+      prog_channel.send(frase+' '+progresso+' **( '+ detalhe_bem_inutil + formatar(progresso_que_tivemos) +' erros )** '+quem_ganhou_o_round, {
+        files: [
+          "./atual.png",
+          "./resultado_diff.png"
+        ]
+      });
+    })
+    message.reply("**A Mensagem de Progresso está sendo enviada!** :partying_face:")
+  }
+
     // pixels
 
     // mute temporario
@@ -293,11 +366,12 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
       if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
       if (message.author.bot) return;
       message.reply("**Backup enviado!**")
-      message.author.send("**Backup do Arquivo Leaderboard.json, do Arquivo Tags.json e do Arquivo kuruminha.js!**", {
+      message.author.send("**Backup dos Arquivos: Leaderboard.json, Kuruminha.js, Tags.json e ultimos_erros.txt!**", {
         files: [
           "./leaderboard.json",
           "./tags.json",
-          "./kuruminha.js"
+          "./kuruminha.js",
+          "./stats/ultimos_erros.txt"
         ]
       });
     }
@@ -634,6 +708,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
         .addField('owop','Permite ver algumas informações do OWOP. | **/owop**')
         .addField('addtag','Permite criar uma tag. | **/addtag hm asuma é gay**')
         .addField('tag','Permite visualizar uma tag. | **/tag hm**')
+        .addField('comparar','Compara a Imagem Enviada com a MegaBR. | **/comparar**')
         .setTimestamp()
         .setFooter('Kuruminha');
         message.reply(msg)
@@ -794,7 +869,7 @@ var avatarz = function() {
   var avatar_escolhido = Math.floor(Math.random() * (avatar_list.length))
     client.user.setAvatar(avatar_list[avatar_escolhido])
     client.user.setActivity(playing_list[jogo_escolhido])
-     },60000) // 1 min
+     },300000) // 5 mins
      console.log('feito')
     }
 

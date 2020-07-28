@@ -1,6 +1,6 @@
 {
   "name": "kuruma",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "A Discord Bot!",
   "main": "kuruminha.js",
   "dependencies": {
@@ -9,7 +9,10 @@
     "fs": "0.0.1-security",
     "ms": "2.1.2",
     "edit-json-file": "1.4.0",
-    "dabi-images": "2.7.5"
+    "dabi-images": "2.7.5",
+    "pngjs": "5.0.0",
+    "image-downloader": "4.0.1",
+    "pixelmatch": "5.2.1"
 
   },
   "devDependencies": {},
