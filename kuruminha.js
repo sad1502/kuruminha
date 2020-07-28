@@ -89,6 +89,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
       var prog_channel = message.guild.channels.cache.find(channels => channels.name == '📊・megabr');
      
       var cu = fs.readFileSync('./stats/ultimos_erros.txt', 'utf-8')
+
       if (cu > difference) { // teve progresso
         frase = ':chart_with_upwards_trend:'
         progresso_que_tivemos = cu-difference
@@ -111,6 +112,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
 
       fs.writeFileSync('./stats/ultimos_erros.txt', difference)
 
+      setTimeout(() => {
       prog_channel.send(frase+' '+progresso+' **( '+ detalhe_bem_inutil + formatar(progresso_que_tivemos) +' erros )** '+quem_ganhou_o_round, {
         files: [
           "./atual.png",
@@ -118,7 +120,8 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
         ]
       });
     })
-    message.reply("**A Mensagem de Progresso está sendo enviada!** :partying_face:")
+    message.reply("**Mensagem de Progresso Enviada!** :hugging:")
+  },5000)
   }
 
     // pixels
