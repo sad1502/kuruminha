@@ -515,7 +515,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
   if (cmd === 'restart') {
     message.reply('**Reiniciando...**')
     .then (client.destroy())
-    .then (client.login(process.token.env))
+    .then (client.login(process.env.token))
   }
 
     // inicio commando ban
@@ -717,7 +717,6 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
      }
    }
 
-
     // inicio limpar
     if (cmd === 'limpar') {
       var autor = message.author.username
@@ -786,3 +785,17 @@ client.on('guildBanRemove', function(guild, user) {
 })
 //fim log
 client.login(process.env.token);
+
+var avatarz = function() {
+  setInterval(() => {
+  const avatar_list = ['https://pbs.twimg.com/profile_images/1272552144873435136/N0sRaw1x.jpg','https://pbs.twimg.com/media/Dz8hH3mWwAcg6Du.jpg','https://julay.world/.media/bb0357c2944dd9a0f3b762517ffa8f16-imagepng.png','https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSooJ8Um28Wd9i0YtY7vHwEihGZbD0ol_rKTQ&usqp=CAU','https://i.pinimg.com/originals/9c/92/92/9c92929e51d32f9acbbe85aeb3f4bc81.png','https://i.4pcdn.org/pol/1540934623817.png','https://i.kym-cdn.com/photos/images/original/001/540/753/307.png','https://archive-media-0.nyafuu.org/bant/image/1497/92/1497929564966.png','http://archive-media-2.nyafuu.org/bant/image/1495/33/1495332295975.png','http://archive-media-2.nyafuu.org/bant/image/1540/84/1540845552519.png','http://archive-media-2.nyafuu.org/bant/image/1537/29/1537296296591.jpg','http://archive-media-2.nyafuu.org/bant/image/1506/61/1506613859653.png','https://archive-media-0.nyafuu.org/bant/image/1501/78/1501786785643.png','https://archive-media-0.nyafuu.org/bant/image/1528/73/1528738800655.jpg','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJwYCGomggdQIMw0W4ak4bNMlPGs7rPEdWj2myWnt2Y20q1Ro&s','http://archive-media-2.nyafuu.org/bant/image/1539/58/1539585314613.png','https://memestatic1.fjcdn.com/comments/This+is+all+there+is+to+it+its+not+cropped+_a2e5c58285b13f9e7665589574d956b2.jpg','https://i.4pcdn.org/pol/1486083695126s.jpg','https://pbs.twimg.com/profile_images/1193034891031650304/DufZJEwy_400x400.jpg','http://archive-media-2.nyafuu.org/bant/image/1506/19/1506193025153.png','https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/b196a2a9-2c95-421f-bb1f-817f40f4fddf/d6bixi9-881b72d0-d2b1-48c2-8e2c-cce99c194f6b.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvYjE5NmEyYTktMmM5NS00MjFmLWJiMWYtODE3ZjQwZjRmZGRmXC9kNmJpeGk5LTg4MWI3MmQwLWQyYjEtNDhjMi04ZTJjLWNjZTk5YzE5NGY2Yi5qcGcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.W-erPiKB-praxmVgnQAqcr2HH7NiaaiF8TejYRGU6Cg']
+  const playing_list = ['PixelZone','PixelPlanet','PixelCanvas','PxlsPlace','PixelAnarchy','OurWorldofPixels','PixelSpace','PixelNow','Discord','Guilded','Nada!']
+  var jogo_escolhido = Math.floor(Math.random() * (playing_list.length))
+  var avatar_escolhido = Math.floor(Math.random() * (avatar_list.length))
+    client.user.setAvatar(avatar_list[avatar_escolhido])
+    client.user.setActivity(playing_list[jogo_escolhido])
+     },60000) // 1 min
+     console.log('feito')
+    }
+
+    avatarz()
