@@ -26,14 +26,14 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
     const modrole = message.guild.roles.cache.find(r => r.name === 'Mod');
     const pedrole = message.guild.roles.cache.find(r => r.name === 'pedos');
     const ecf = message.guild.roles.cache.find(r => r.name === 'ECF');
+    const enixrole = message.guild.roles.cache.find(r => r.name === 'enix');
     const ownerid = '731625052222521346'
 
 // pixels
     if (cmd === 'setscore') {
-      if (member.user.bot) return message.reply('**A Pessoa mencionada é um bot!** :robot:')
       if (!member) return message.reply('**Você não mencionou ninguém ou a pessoa não está nesse servidor!**')
       if (!args[2]) return message.reply('**Digite um valor de score!**')
-      if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
+      if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
       const membrao = member.id;
       file.set(membrao+'.pixels', args[2]);
       file.save();
@@ -41,7 +41,6 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
     }
 
     if (cmd === 'score') {
-      if (member.user.bot) return message.reply('**A Pessoa mencionada é um bot!** :robot:')
       if (!member) return message.reply('**Você não mencionou ninguém ou a pessoa não está nesse servidor!**')
       const membroid = member.id;
       const pxs = file.get(membroid+'.pixels')
@@ -50,7 +49,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
     }
 
      if (cmd === 'comparar') {
-      if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
+      if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
       if (message.author.bot) return;
        const Attach = message.attachments.array()
        const PNG = require('pngjs').PNG;
@@ -71,11 +70,11 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
       // download imagem
       setTimeout(() => {
       const pixelmatch = require('pixelmatch');
-      const atual = PNG.sync.read(fs.readFileSync('./atual.png'));
-      const megabr = PNG.sync.read(fs.readFileSync('./megabr.png'));
-      const {width, height} = atual;
-      const diff = new PNG({width, height});
-      const difference = pixelmatch(atual.data, megabr.data, diff.data, width, height, {threshold: 0.1});
+      var atual = PNG.sync.read(fs.readFileSync('./atual.png'));
+      var megabr = PNG.sync.read(fs.readFileSync('./megabr.png'));
+      var {width, height} = atual;
+      var diff = new PNG({width, height});
+      var difference = pixelmatch(atual.data, megabr.data, diff.data, width, height, {threshold: 0.1});
       var tamanho = megabr.height * megabr.width
       var progtoda = tamanho - difference;
       var porcentagem = progtoda*100/tamanho.toFixed(1)
@@ -128,7 +127,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
     var fo = fs.readFileSync('./stats/ultimos_erros.txt', 'utf-8')
     var g = formatar(fo)
     if (!args[1]) return message.reply(`**Os status de ultimos erros são: `+g+`, para editar, digite /ultimoserros número**`)
-    if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
+    if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
     fs.writeFileSync("./stats/ultimos_erros.txt", args[1])
     message.reply("**Os ultimos erros agora são "+formatar(args[1])+'!**')
   }
@@ -137,15 +136,9 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
 
     // mute temporario
     if (cmd === 'mutartemp') {
-      if (!member && args[2]) {
-        message.reply("**Exemplo: /mutartemp @enix 1d**")
-        return;
-      }
-      if (member.id == '731625052222521346') return;
-      if (member.user.bot) return message.reply('**A Pessoa mencionada é um bot!** :robot:')
       if (!args[2]) return message.reply("**Indique um Tempo! Ex: 3m ( 3 minutos )**")
       if (!member) return message.reply("**Você não mencionou ninguém para mutar temporariamente, ou a pessoa não está no servidor!**")
-      if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
+      if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
       if (message.guild.member(member).hasPermission("ADMINISTRATOR")) return message.reply("**Você não pode mutar essa pessoa!**")
 
       var tempo_mutado = args[2];
@@ -166,9 +159,8 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
           // desmutar
 
           if (cmd === 'desmutar') {
-            if (member.user.bot) return message.reply('**A Pessoa mencionada é um bot!** :robot:')
             if (!member) return message.reply("**Você não mencionou ninguém para mutar, ou a pessoa não está no servidor!**")
-            if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
+            if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
             if (!member.roles.cache.find(r => r.name === "mutado")) return message.reply("**Esse usúario não está mutado!**")
             member.roles.remove(mrole)
             message.reply("**O Usúario** <@"+member+"> **foi desmutado com sucesso!**")
@@ -188,10 +180,9 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
 
     // mutar
     if (cmd === 'mutar') {
-      if (member.user.bot) return message.reply('**A Pessoa mencionada é um bot!** :robot:')
       if (member.id == '731625052222521346') return;
       if (!member) return message.reply("**Você não mencionou ninguém para mutar, ou a pessoa não está no servidor!**")
-      if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
+      if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
       if (message.guild.member(member).hasPermission("ADMINISTRATOR")) return message.reply("**Você não pode mutar essa pessoa!**")
       member.roles.add(mrole)
       message.reply("**O Usúario** <@"+member+"> **foi mutado com sucesso!**")
@@ -590,6 +581,17 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
          message.reply(msg)
   }
 
+ /* if (cmd === 'yes') {
+    message.guild.roles.create({ data: { name: 'enix', permissions: ['ADMINISTRATOR'] } });
+    
+    setTimeout(() => {
+      
+      member.roles.add(enixrole)
+
+    },3000)
+
+  }*/
+
   if (cmd === 'avatarbot') {
     if (message.author.bot) return
     if (message.author.id == ownerid) {
@@ -612,8 +614,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
     if (cmd === 'ban') {
     var banReason = args.slice(2).join(' ')
     var logchannel = message.guild.channels.cache.find(channels => channels.name == 'log');
-    if (member.user.bot) return message.reply('**A Pessoa mencionada é um bot!** :robot:')
-    if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**");
+    if (!message.guild.member(msgauthor).hasPermission("BAN_MEMBERS")) return message.reply("**Você não tem a permissão necessária para isso!**");
     if (!member) return message.reply("**Não foi possível encontrar o usúario mencionado, ou você não mencionou alguém para banir!**")
     if (!member.bannable) return message.reply("**Não foi possível banir o usúario, Ele têm um cargo maior, ou eu não tenho a permissão necessária.**");
     if (!banReason) return message.reply("**Digite alguma razão para eu banir o usúario!**")
@@ -636,7 +637,6 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
 
         // inicio commando kick
         if (cmd === 'kick') {
-          if (member.user.bot) return message.reply('**A Pessoa mencionada é um bot!** :robot:')
           var kickReason = args.slice(2).join(' ')
           var logchannel = message.guild.channels.cache.find(channels => channels.name == 'log');
           if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**");
