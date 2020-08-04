@@ -12,7 +12,9 @@
     "dabi-images": "2.7.5",
     "pngjs": "5.0.0",
     "image-downloader": "4.0.1",
-    "pixelmatch": "5.2.1"
+    "pixelmatch": "5.2.1",
+    "@danke77/google-translate-api": "1.0.0",
+    "@hkh12/node-calc": "4.0.3"
 
   },
   "devDependencies": {},

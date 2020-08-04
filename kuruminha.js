@@ -30,6 +30,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
     const ownerid = '731625052222521346'
 
 // pixels
+
     if (cmd === 'setscore') {
       if (!member) return message.reply('**Você não mencionou ninguém ou a pessoa não está nesse servidor!**')
       if (!args[2]) return message.reply('**Digite um valor de score!**')
@@ -266,6 +267,61 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
         }
       }
       // fim covid
+
+      // translatoreiro
+      if (cmd === 'traduzir') {
+        let traduzir_pra = args[1]
+        let texto = args.slice(2).join(' ')
+        if (!texto) return message.reply("**Digite um texto para traduzir!**")
+        if (!traduzir_pra) return message.reply("**Indique uma linguagem para traduzir o texto, ex: english**")
+        const Translator = require('@danke77/google-translate-api');
+
+        const translator = new Translator({
+          from: 'auto',
+          to: traduzir_pra,
+          raw: false,
+          client: 'gtx', // t
+          tld: 'cn',
+      });
+
+      const res = await translator.translate(texto)
+      .catch(err => {
+          console.error(err);
+      });
+
+      message.reply(`**${res.text}**`)
+
+      }
+      // fim translatoreiração
+
+      // math
+      if (cmd === 'math') {
+      let argumentos = args.slice(1).join(' ');
+      if (!argumentos) return message.reply("**Indique uma Equação!**")
+      const { evalExpression, tokenize, Token, evalTokens } = require('@hkh12/node-calc');
+      const resposta = evalExpression(argumentos)
+      message.reply("**"+resposta+"**")
+
+      }
+      // fim math
+
+      //tempo
+      if (cmd === 'timemath') {
+        let argumentoss = args.slice(1).join(' ');
+        if (!argumentoss) return message.reply("**Defina uma data. Exemplo: Sep 1, 2020 00:00:00**")
+        var data = new Date(argumentoss).getTime(); // insira a data aqui < ---
+        var data2 = new Date().getTime(); // pega o horário atual
+        var distancia = data - data2; // verifica a distancia da data atual com a data marcada.
+
+        var days = Math.floor(distancia / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distancia % (1000 * 60)) / 1000);
+
+        message.reply(`**Faltam ${days} dias, ${hours} horas, ${minutes} minutos e ${seconds} segundos até ${argumentoss}**`)
+
+      }
+      // fim tempo
 
 
       // funnação fun
@@ -725,6 +781,8 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
         .addField('addtag','Permite criar uma tag. | **/addtag hm asuma é gay**')
         .addField('tag','Permite visualizar uma tag. | **/tag hm**')
         .addField('comparar','Compara a Imagem Enviada com a MegaBR. | **/comparar**')
+        .addField('math','Permite ver o resultado de equações. | **/math 1 + 1**')
+        .addField('timemath', 'Permite ver quanto tempo falta até certa data. | **/timemath Aug 07, 2020 00:00:00**')
         .setTimestamp()
         .setFooter('Kuruminha');
         message.reply(msg)
