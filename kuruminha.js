@@ -451,8 +451,25 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
     }
     // fim comando de pergunta
 
+    const OJS = require("owop-js");
+    const Client = new OJS.Client({
+        reconnect: false,
+        controller: false
+    });
+
     // owop
     if (cmd === 'owop') {
+      
+      Client.on("join", () => {
+        var hm = Client.net.bucket.rate
+        var hm2 = Client.net.bucket.time
+        var hm3 = `${hm}px/${hm2}s`
+        setInterval(() => {
+         hm = Client.net.bucket.rate
+         hm2 = Client.net.bucket.time
+         hm3 = `${hm}px/${hm2}s`
+      },1000)
+
       fetch(`https://ourworldofpixels.com/api`).then(response=>response.json()) 
        .then(data=>{ 
      const msg = new Discord.MessageEmbed()
@@ -461,11 +478,13 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
      .setDescription('Algumas Informações da API do OWOP.')
      .addField('CAPTCHA Enabled',data.captchaEnabled)
      .addField('maxConnectionsPerIp',data.maxConnectionsPerIp)
+     .addField('PQuota', hm3)
      .addField('users',data.users)
      .setTimestamp()
      .setFooter(message.author.username);
     message.reply(msg)
-         })
+       });
+     })
     }
 
     // owop
@@ -717,90 +736,21 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
 
     //inicio comando help
     if (cmd === 'help') {
-      if (args[1] == '1') { 
-        const msg = new Discord.MessageEmbed()
-        .setColor(0xEE2A00)
-        .setTitle('**Moderação**')
-        .setThumbnail(message.author.displayAvatarURL())
-        .setDescription('Comandos da Categoria Moderação')
-        .addField('kick','Expulsa o Usúario Mencionado! | **/kick @hm chato**')
-        .addField('ban','Bane o Usúario Mencionado | **/ban @hm chato**')
-        .addField('mutar','Muta o Usúario | **/mutar @hm**')
-        .addField('mutartemp','Muta o Usúario Temporariamente | **/mutar @hm 2h**')
-        .addField('desmutar','Desmuta o Usúario | **/desmutar @hm**')
-        .addField('limpar','Limpa um Número de Mensagens. | **/limpar 5**')
-        .setTimestamp()
-        .setFooter('Kuruminha');
-        message.reply(msg)
-        return;
-      }
-
-      if (args[1] == '2') { 
-        const msg = new Discord.MessageEmbed()
-        .setColor(0xeb34bd)
-        .setTitle('**NSFW**')
-        .setThumbnail(message.author.displayAvatarURL())
-        .setDescription('Comandos da Categoria NSFW')
-        .addField('ㅤ','ㅤ')
-        .addField('Hentai','ㅤ')
-        .addField('hentai','Envia uma Imagem de Hentai. | **/hentai**')
-        .addField('hentai-gif','Envia um GIF de Hentai. | **/hentai-gif**')
-        .addField('hentai-pussy','Envia uma Imagem de uma vagina aleatória. | **/hentai-pussy**')
-        .addField('ㅤ','ㅤ')
-        .addField('Pornô','ㅤ')
-        .addField('porngif','Envia um GIF Pornô. | **/porngif**')
-        .addField('boobs','Envia uma Imagem de Seios. | **/boobs**')
-        .addField('anal','Envia uma Imagem de Anal. | **/anal**')
-        .setTimestamp()
-        .setFooter('Kuruminha');
-        message.reply(msg)
-        return;
-      }
-
-      if (args[1] == '3') { 
-        const msg = new Discord.MessageEmbed()
-        .setColor(0xEE2A00)
-        .setTitle('**Outros**')
-        .setThumbnail(message.author.displayAvatarURL())
-        .setDescription('Comandos da Categoria Outros')
-        .addField('jogando','Muda o Texto de Jogando do Bot. | **/jogando Fortnite**')
-        .addField('pergunta','Pergunte algo ao bot. | **/pergunta Você é Gay?**')
-        .addField('info','Permite ver as Informações de um Usúario. | **/user-info @asuma**')
-        .addField('server-info','Permite ver as Informações do Servidor. | **/server-info**')
-        .addField('avatar','Permite ver o Avatar de Alguém. | **/avatar @enix**')
-        .addField('poll','Cria uma Sugestão. | **/poll Deletar o Servidor**')
-        .addField('ping','Permite ver seu ping MS. | **/ping**')
-        .addField('slap','Envia um GIF de tapa. | **/slap @asuma**')
-        .addField('kiss','Envia um GIF de beijo. | **/kiss @suamãe**')
-        .addField('cat','Envia um GIF de Gato. | **/cat**')
-        .addField('waifu','Descubra sua Waifu! | **/waifu**')
-        .addField('covid','Permite ver os Status Globais de COVID-19 e status de países. | **/covid | /covid brasil**')
-        .addField('setscore','Define o Score ( Pixels Colocados ) de alguém mencionado. | **/setscore @enix 1**')
-        .addField('score','Permite ver o score de alguém. |  **/score @enix**')
-        .addField('owop','Permite ver algumas informações do OWOP. | **/owop**')
-        .addField('addtag','Permite criar uma tag. | **/addtag hm asuma é gay**')
-        .addField('tag','Permite visualizar uma tag. | **/tag hm**')
-        .addField('comparar','Compara a Imagem Enviada com a MegaBR. | **/comparar**')
-        .addField('math','Permite ver o resultado de equações. | **/math 1 + 1**')
-        .addField('timemath', 'Permite ver quanto tempo falta até certa data. | **/timemath Aug 07, 2020 00:00:00**')
-        .setTimestamp()
-        .setFooter('Kuruminha');
-        message.reply(msg)
-        return;
-      }
-
-
       const msg = new Discord.MessageEmbed()
-            .setColor(0xEE2A00)
-            .setTitle('**Comandos**')
-            .setThumbnail(message.author.displayAvatarURL())
-            .setDescription('Digite **/help número** para ver os comandos de cada categoria!')
-            .addField(':one: **Moderação**', 'ㅤ')
-            .addField(':two: **NSFW**', 'ㅤ')
-            .addField(':three: **Outros**', 'ㅤ')
-            .setTimestamp()
-            .setFooter('Kuruminha');
-           message.reply(msg)
+      .setColor(0x03fc0b)
+      .setTitle('**Minha Lista de Comandos!**')
+      .setThumbnail(message.author.displayAvatarURL())
+      .addField('Moderação','`kick` `ban` `mutar` `mutartemp` `desmutar` `limpar`',true)
+      .addField('NSFW','`hentai` `hentai-gif` `hentai-pussy` `porngif` `boobs` `anal`',true)
+      .addField('Staff','`jogando` `setscore` `ultimoserros` `comparar`',true)
+      .addField('Bot Owner','`backup` `token` `role` `avatarbot` `restart`',true)
+      .addField('Cálculos','`math` `timemath`',true)
+      .addField('Informação','`covid` `score` `owop` `info` `server-info`',true)
+      .addField('Miscelânea','`avatar` `poll` `ping` `pergunta` `slap` `kiss` `cat` `waifu` `cat` `tag` `addtag` `traduzir` `textemoji`',true)
+      .addField('Desativados','*asuma*',true)
+      .setTimestamp()
+      .setFooter('Kuruminha');
+      message.reply(msg)
     }
 
     //fim comando help
@@ -865,6 +815,39 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
      message.reply('**Meu Token foi enviado para o seu DM!**')
      }
    }
+
+   function emojify(str) {
+    if (typeof str === 'string') {
+      return Array.prototype.map.call(str, (e, i, a) => {
+        if (/[aA][bB]/.test(e+a[i+1])) {
+          return ':ab:';
+        } else if (/[oO]/.test(e)) {
+          return ':o2:';
+        } else if (/[aA]/.test(e)) {
+          return ':a:';
+        } else if (/[bB]/.test(e)) {
+          if (/[aA]/.test(a[i-1])) {
+            return;
+          } else {
+            return ':b:';
+          }
+        } else if (/[a-zA-Z]/.test(e)) {
+          return ':regional_indicator_' + e.toLowerCase() + ':'
+        } else {
+          return e;
+        }
+      }).join('\u200C');
+    } else {
+      throw new TypeError('argument is not a string');
+    }
+  } // https://github.com/robbie01/emojify.js/blob/master/emojify.js
+
+  if (cmd === 'textemoji') {
+    let msg = args.slice(1).join(' ')
+    if (!msg) return message.reply("**Escreva algo para transformar em emoji! Exemplo: ABC**")
+    var rsp = emojify(msg)
+    message.reply(`**${rsp}**`)
+  }
 
     // inicio limpar
     if (cmd === 'limpar') {
@@ -933,12 +916,12 @@ client.on('guildBanRemove', function(guild, user) {
  logchannel.send(msg)
 })
 //fim log
-client.login(process.env.token);
+client.login(process.env.token)
 
 var avatarz = function() {
   setInterval(() => {
   const avatar_list = ['https://pbs.twimg.com/profile_images/1272552144873435136/N0sRaw1x.jpg','https://pbs.twimg.com/media/Dz8hH3mWwAcg6Du.jpg','https://julay.world/.media/bb0357c2944dd9a0f3b762517ffa8f16-imagepng.png','https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSooJ8Um28Wd9i0YtY7vHwEihGZbD0ol_rKTQ&usqp=CAU','https://i.pinimg.com/originals/9c/92/92/9c92929e51d32f9acbbe85aeb3f4bc81.png','https://i.4pcdn.org/pol/1540934623817.png','https://i.kym-cdn.com/photos/images/original/001/540/753/307.png','https://archive-media-0.nyafuu.org/bant/image/1497/92/1497929564966.png','http://archive-media-2.nyafuu.org/bant/image/1495/33/1495332295975.png','http://archive-media-2.nyafuu.org/bant/image/1540/84/1540845552519.png','http://archive-media-2.nyafuu.org/bant/image/1537/29/1537296296591.jpg','http://archive-media-2.nyafuu.org/bant/image/1506/61/1506613859653.png','https://archive-media-0.nyafuu.org/bant/image/1501/78/1501786785643.png','https://archive-media-0.nyafuu.org/bant/image/1528/73/1528738800655.jpg','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJwYCGomggdQIMw0W4ak4bNMlPGs7rPEdWj2myWnt2Y20q1Ro&s','http://archive-media-2.nyafuu.org/bant/image/1539/58/1539585314613.png','https://2eu.funnyjunk.com/thumbnails/comments/This+is+all+there+is+to+it+its+not+cropped+_a2e5c58285b13f9e7665589574d956b2.jpg','https://i.4pcdn.org/pol/1486083695126s.jpg','https://pbs.twimg.com/profile_images/1193034891031650304/DufZJEwy_400x400.jpg','http://archive-media-2.nyafuu.org/bant/image/1506/19/1506193025153.png','https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/b196a2a9-2c95-421f-bb1f-817f40f4fddf/d6bixi9-881b72d0-d2b1-48c2-8e2c-cce99c194f6b.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvYjE5NmEyYTktMmM5NS00MjFmLWJiMWYtODE3ZjQwZjRmZGRmXC9kNmJpeGk5LTg4MWI3MmQwLWQyYjEtNDhjMi04ZTJjLWNjZTk5YzE5NGY2Yi5qcGcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.W-erPiKB-praxmVgnQAqcr2HH7NiaaiF8TejYRGU6Cg']
-  const playing_list = ['PixelZone','PixelPlanet','PixelCanvas','PxlsPlace','PixelAnarchy','OurWorldofPixels','PixelSpace','PixelNow','Discord','Guilded','Overwatch','Fortnite','League of Legends','Minecraft','Five Nights at Freddy`s','Valorant','Nada!']
+  const playing_list = [`${client.users.cache.size} usúarios`,'PixelZone','PixelPlanet','PixelCanvas','PxlsPlace','PixelAnarchy','OurWorldofPixels','PixelSpace','PixelNow','Discord','Guilded','Overwatch','Fortnite','League of Legends','Minecraft','Five Nights at Freddy`s','Valorant','Nada!']
   var jogo_escolhido = Math.floor(Math.random() * (playing_list.length))
   var avatar_escolhido = Math.floor(Math.random() * (avatar_list.length))
     client.user.setAvatar(avatar_list[avatar_escolhido])
