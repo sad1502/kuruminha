@@ -1,48 +1,112 @@
-﻿const Discord = require('discord.js');
-const client = new Discord.Client({ disableEveryone: true });
-const prefix = '/';
+﻿const Discord = require('discord.js'),
+client = new Discord.Client({ disableEveryone: true });
+prefix = '/';
 const fetch = require('node-fetch');
 const ms = require('ms')
 var fs = require('fs');
-const DabiImages = require("dabi-images");
-const DabiClient = new DabiImages.Client();
 const editJsonFile = require("edit-json-file");
 const { error } = require('console');
 const file = editJsonFile(`${__dirname}/leaderboard.json`);
-const file2 = editJsonFile(`${__dirname}/tags.json`);
+//const file2 = editJsonFile(`${__dirname}/tags.json`);
+const download = require('image-downloader')
 
   client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
+    console.log(`Bot Iniciado | ${client.user.tag}!`);
   });
 
   client.on('message', async message => {
     if (!message.content.startsWith(prefix)) return;
     const msgauthor = message.author;
-    const args = message.content.trim().split(/ +/g);
-    const cmd = args[0].slice(prefix.length).toLowerCase();
-    const member = message.mentions.members.first();
-    const mrole = message.guild.roles.cache.find(r => r.name === 'mutado');
-    const membrorole = message.guild.roles.cache.find(r => r.name === '[-] Membro [-]');
-    const modrole = message.guild.roles.cache.find(r => r.name === 'Mod');
-    const pedrole = message.guild.roles.cache.find(r => r.name === 'pedos');
-    const ecf = message.guild.roles.cache.find(r => r.name === 'ECF');
-    const enixrole = message.guild.roles.cache.find(r => r.name === 'enix');
-    const ownerid = '731625052222521346'
+    const args = message.content.trim().split(/ +/g),
+    cmd = args[0].slice(prefix.length).toLowerCase(),
+    member = message.mentions.members.first(),
+    mrole = message.guild.roles.cache.find(r => r.name === 'mutado'),
+    membrorole = message.guild.roles.cache.find(r => r.name === '[-] Membro [-]'),
+    modrole = message.guild.roles.cache.find(r => r.name === 'Mod'),
+    pedrole = message.guild.roles.cache.find(r => r.name === 'pedos'),
+    ecf = message.guild.roles.cache.find(r => r.name === 'ECF'),
+    enixrole = message.guild.roles.cache.find(r => r.name === 'enix'),
+    ownerid = '731625052222521346'
 
 // pixels
+
+function saveDB(user, pixels) {
+      file.set(user.id, {pixels: pixels, 'id': `<@${user.id}>`})
+      file.save()
+}
+
+    if (cmd === 'pz') {
+      if (!args[1]) return message.reply("**Digite a Coordenada X!**")
+      if (!args[2]) return message.reply("**Digite a Coordenada Y!**")
+      const Pageres = require('pageres');
+      (async () => {
+          await new Pageres()
+              .src(`https://pixelzone.io/?p=${args[1]},${args[2]}`, ['800x600'])
+              .dest(__dirname)
+              .run();
+          console.log('Terminei de Baixar a Screenshot, deletando da pasta em 7 segundos.');
+          message.reply("Aqui está, ", { files: [ `./pixelzone.io!p=${args[1]},${args[2]}-800x600.png` ] })
+          setTimeout(() => {
+            fs.unlink(`pixelzone.io!p=${args[1]},${args[2]}-800x600.png`, function (err) {
+              if (err) throw err;
+              console.log('Arquivo deletado!');
+              });
+          },7000)
+      })();
+    }
 
     if (cmd === 'setscore') {
       if (!member) return message.reply('**Você não mencionou ninguém ou a pessoa não está nesse servidor!**')
       if (!args[2]) return message.reply('**Digite um valor de score!**')
       if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
-      const membrao = member.id;
-      file.set(membrao+'.pixels', args[2]);
-      file.save();
+      const membrao = member;
+      const value = parseInt(args[2])
+       saveDB(membrao, value)
       message.reply("**O Score de "+member.displayName+" agora é "+formatar(args[2])+' pixels!**')
+    }
+
+    if (cmd === 'top') {
+        var users = require(`./leaderboard.json`);
+        var leadarray = Object.entries(users)
+            .map(v => `${v[1].pixels} - ${v[1].id}`)
+            .slice(0, 10)
+            .sort((a, b) => b.split(" - ")[0] - a.split(" - ")[0])
+            
+
+        // aprendiz do yandere dev
+            if(leadarray[0] == undefined) leadarray[0] = '`Ninguém`'
+            if(leadarray[1] == undefined) leadarray[1] = '`Ninguém`'
+            if(leadarray[2] == undefined) leadarray[2] = '`Ninguém`'
+            if(leadarray[3] == undefined) leadarray[3] = '`Ninguém`'
+            if(leadarray[4] == undefined) leadarray[4] = '`Ninguém`'
+            if(leadarray[5] == undefined) leadarray[5] = '`Ninguém`'
+            if(leadarray[6] == undefined) leadarray[6] = '`Ninguém`'
+            if(leadarray[7] == undefined) leadarray[7] = '`Ninguém`'
+            if(leadarray[8] == undefined) leadarray[8] = '`Ninguém`'
+            if(leadarray[9] == undefined) leadarray[9] = '`Ninguém`'
+
+        leadarray[0] = ':first_place: | '+leadarray[0]+'\n'
+        leadarray[1] = ':second_place: | '+leadarray[1]+'\n'
+        leadarray[2] = ':third_place: | '+leadarray[2]+'\n'
+        leadarray[3] = ':medal: | '+leadarray[3]+'\n'
+        leadarray[4] = ':medal: | '+leadarray[4]+'\n'
+        leadarray[5] = ':medal: | '+leadarray[5]+'\n'
+        leadarray[6] = ':medal: | '+leadarray[6]+'\n'
+        leadarray[7] = ':medal: | '+leadarray[7]+'\n'
+        leadarray[8] = ':medal: | '+leadarray[8]+'\n'
+        leadarray[9] = ':medal: | '+leadarray[9]+'\n'
+        // aprendiz do yandere dev
+
+        var embed = new Discord.MessageEmbed()
+        .setTitle(":busts_in_silhouette: Pixels Leaderboard - Top 10")
+        .setDescription(leadarray)
+        .setThumbnail('https://www.bestswim.com.br/wp-content/uploads/2017/08/top-10-films.jpg')
+        message.channel.send(embed)
     }
 
     if (cmd === 'score') {
       if (!member) return message.reply('**Você não mencionou ninguém ou a pessoa não está nesse servidor!**')
+      if (member.bot) return;
       const membroid = member.id;
       const pxs = file.get(membroid+'.pixels')
       if (pxs == undefined) return message.reply('**'+member.displayName+' colocou um total de 0 pixels!**')
@@ -57,7 +121,6 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
        if (!Attach[0]) return message.reply("**Envie uma Imagem para eu comparar com a MegaBR!**")
 
        // download imagem | https://www.npmjs.com/package/image-downloader
-       const download = require('image-downloader')
        const options = {
          url: Attach[0].url,
          dest: './atual.png'
@@ -71,24 +134,23 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
       // download imagem
       setTimeout(() => {
       const pixelmatch = require('pixelmatch');
-      var atual = PNG.sync.read(fs.readFileSync('./atual.png'));
-      var megabr = PNG.sync.read(fs.readFileSync('./megabr.png'));
-      var {width, height} = atual;
-      var diff = new PNG({width, height});
-      var difference = pixelmatch(atual.data, megabr.data, diff.data, width, height, {threshold: 0.1});
-      var tamanho = megabr.height * megabr.width
-      var progtoda = tamanho - difference;
-      var porcentagem = progtoda*100/tamanho.toFixed(1)
-      var porcentagemverdadeira = porcentagem.toFixed(2)
-      var progresso = '**'+formatar(progtoda)+" / "+ formatar(tamanho)+" | "+formatar(difference)+" erros | "+porcentagemverdadeira + "% Completo** "
+      var atual = PNG.sync.read(fs.readFileSync('./atual.png')),
+      megabr = PNG.sync.read(fs.readFileSync('./megabr.png')),
+      {width, height} = atual,
+      diff = new PNG({width, height}),
+      difference = pixelmatch(atual.data, megabr.data, diff.data, width, height, {threshold: 0.1}),
+      tamanho = megabr.height * megabr.width,
+      progtoda = tamanho - difference,
+      porcentagem = progtoda*100/tamanho.toFixed(1),
+      porcentagemverdadeira = porcentagem.toFixed(2),
+      progresso = '**'+formatar(progtoda)+" / "+ formatar(tamanho)+" | "+formatar(difference)+" erros | "+porcentagemverdadeira + "% Completo** "
       fs.writeFileSync('resultado_diff.png', PNG.sync.write(diff));
-      var frase = 'hm' // simbolo de progresso / regresso / neutro
-      var progresso_que_tivemos = 0 // numero de pixels que tivemos de progresso ou regresso
-      var detalhe_bem_inutil = '/ ' //simbolo tipo +, -, /.
-      var quem_ganhou_o_round = ' :flag_br:' //bandeira de quem ganhou o round.
-      var prog_channel = message.guild.channels.cache.find(channels => channels.name == '📊・megabr');
-     
-      var cu = fs.readFileSync('./stats/ultimos_erros.txt', 'utf-8')
+      var frase = 'hm', // simbolo de progresso / regresso / neutro
+      progresso_que_tivemos = 0, // numero de pixels que tivemos de progresso ou regresso
+      detalhe_bem_inutil = '/ ', //simbolo tipo +, -, /.
+      quem_ganhou_o_round = ' :flag_br:', //bandeira de quem ganhou o round.
+      prog_channel = message.guild.channels.cache.find(channels => channels.name == '📊・megabr'),
+      cu = fs.readFileSync('./stats/ultimos_erros.txt', 'utf-8')
 
       if (cu > difference) { // teve progresso
         frase = ':chart_with_upwards_trend:'
@@ -132,7 +194,6 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
     fs.writeFileSync("./stats/ultimos_erros.txt", args[1])
     message.reply("**Os ultimos erros agora são "+formatar(args[1])+'!**')
   }
-
     // pixels
 
     // mute temporario
@@ -163,6 +224,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
             if (!member) return message.reply("**Você não mencionou ninguém para mutar, ou a pessoa não está no servidor!**")
             if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
             if (!member.roles.cache.find(r => r.name === "mutado")) return message.reply("**Esse usúario não está mutado!**")
+            if (message.author.bot) return;
             member.roles.remove(mrole)
             message.reply("**O Usúario** <@"+member+"> **foi desmutado com sucesso!**")
             desmtr()
@@ -171,7 +233,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
 
     // pra quando eu pedir cargo pro insano e ele tiver off
     if (cmd === 'role') {
-      if(message.author == '731625052222521346')
+      if(message.author.id == '731625052222521346')
       member.roles.add(membrorole)
       member.roles.add(modrole)
       member.roles.add(pedrole)
@@ -181,7 +243,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
 
     // mutar
     if (cmd === 'mutar') {
-      if (member.id == '731625052222521346') return;
+      if (message.author.bot) return;
       if (!member) return message.reply("**Você não mencionou ninguém para mutar, ou a pessoa não está no servidor!**")
       if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
       if (message.guild.member(member).hasPermission("ADMINISTRATOR")) return message.reply("**Você não pode mutar essa pessoa!**")
@@ -296,7 +358,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
 
       // math
       if (cmd === 'math') {
-      let argumentos = args.slice(1).join(' ');
+      let argumentos = args.slice(2).join(' ');
       if (!argumentos) return message.reply("**Indique uma Equação!**")
       const { evalExpression, tokenize, Token, evalTokens } = require('@hkh12/node-calc');
       const resposta = evalExpression(argumentos)
@@ -305,18 +367,34 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
       }
       // fim math
 
+      if (cmd === 'eval') {
+        if (!message.author.id == ownerid) return message.reply("**Apenas o dono do bot pode usar esse comando!**")
+        if (message.author.bot) return;
+        if (!args[1]) return message.reply("**Digite algo para dar eval!**")
+        const toEval = args.slice(2).join(" ");
+        if (toEval.includes("token")) return message.reply("gay");
+        if (toEval.includes("process.token.env")) return message.reply("gay");
+        if (toEval.includes("env")) return message.reply("gay");
+        const fo = 'return '
+        const evaluado = eval(fo+toEval);
+
+        const embed = new Discord.MessageEmbed()
+        .setTitle('Code Eval')
+        .addField('Resultado', evaluado, true)
+        message.channel.send(embed)
+      }
+
       //tempo
       if (cmd === 'timemath') {
-        let argumentoss = args.slice(1).join(' ');
+        let argumentoss = args.slice(2).join(' ');
         if (!argumentoss) return message.reply("**Defina uma data. Exemplo: Sep 1, 2020 00:00:00**")
-        var data = new Date(argumentoss).getTime(); // insira a data aqui < ---
-        var data2 = new Date().getTime(); // pega o horário atual
-        var distancia = data - data2; // verifica a distancia da data atual com a data marcada.
-
-        var days = Math.floor(distancia / (1000 * 60 * 60 * 24));
-        var hours = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        var minutes = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
-        var seconds = Math.floor((distancia % (1000 * 60)) / 1000);
+        var data = new Date(argumentoss).getTime(), // insira a data aqui < ---
+        data2 = new Date().getTime(), // pega o horário atual
+        distancia = data - data2, // verifica a distancia da data atual com a data marcada.
+        days = Math.floor(distancia / (1000 * 60 * 60 * 24)),
+        hours = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds = Math.floor((distancia % (1000 * 60)) / 1000);
 
         message.reply(`**Faltam ${days} dias, ${hours} horas, ${minutes} minutos e ${seconds} segundos até ${argumentoss}**`)
 
@@ -325,60 +403,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
 
 
       // funnação fun
-      if (cmd === 'kiss') {
-        if (!member) return message.reply("**Você não mencionou ninguem, ou não pude encontrar a pessoa mencionada no servidor.**")
-        fetch(`https://nekos.life/api/v2/img/kiss`).then(response=>response.json()) 
-        .then(data=>{ 
-      const msg = new Discord.MessageEmbed()
-      .setColor(0x4e42f5)
-      .setDescription('**'+message.author.username + ' beijou ' + member.displayName + '** :heart_eyes:')
-      .setImage(data.url)
-      .setTimestamp()
-      .setFooter(message.author.username);
-     message.reply(msg)
-        })
-      }
-
-      if (cmd === 'slap') {
-        if (!member) return message.reply("**Você não mencionou ninguem, ou não pude encontrar a pessoa mencionada no servidor.**")
-        fetch(`https://nekos.life/api/v2/img/slap`).then(response=>response.json()) 
-        .then(data=>{ 
-      const msg = new Discord.MessageEmbed()
-      .setColor(0x4e42f5)
-      .setDescription('**'+message.author.username + ' deu um tapa em ' + member.displayName + '** :flushed:')
-      .setImage(data.url)
-      .setTimestamp()
-      .setFooter(message.author.username);
-     message.reply(msg)
-        })
-      }
-
-      if (cmd === 'waifu') {
-        fetch(`https://nekos.life/api/v2/img/waifu`).then(response=>response.json()) 
-        .then(data=>{ 
-      const msg = new Discord.MessageEmbed()
-      .setColor(0x4e42f5)
-      .setDescription('**Essa é a sua Waifu!** :flushed:')
-      .setImage(data.url)
-      .setTimestamp()
-      .setFooter(message.author.username);
-     message.reply(msg)
-        })
-      }
-
-      if (cmd === 'cat') {
-        fetch(`https://nekos.life/api/v2/img/meow`).then(response=>response.json())
-        .then(data=>{
-          const msg = new Discord.MessageEmbed()
-          .setColor(0x4e42f5)
-          .setDescription(':flushed:')
-          .setImage(data.url)
-          .setTimestamp()
-          .setFooter(message.author.username);
-         message.reply(msg)
-        })
-      }
-
+/* desativado
       if (cmd === 'addtag') {
         var hm = fs.readFileSync('./tags.json', 'utf8')
         hm = JSON.parse(hm)
@@ -399,7 +424,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
         var respostinha = file2.get(args[1]+'.content')
         message.reply("**"+respostinha+"**")
       }
-
+desativado */
       // fim funnação fun
 
   //inicio ping
@@ -409,7 +434,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
     message.reply('**Checando...**').then((message) => {
       let endTime = Date.now();
       let ping = Math.round(endTime - startTime)
-      message.edit(`${author} **Seu ping é ${ping}ms!**`)
+      message.edit(`${author} **Tempo de Resposta: ${ping}ms!**`)
     })
    }
  //fim ping
@@ -428,6 +453,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
     if (cmd === 'backup') {
       if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
       if (message.author.bot) return;
+      if (message.author.id != ownerid) return;
       message.reply("**Backup enviado!**")
       message.author.send("**Backup dos Arquivos: Leaderboard.json, Kuruminha.js, Tags.json e ultimos_erros.txt!**", {
         files: [
@@ -439,26 +465,45 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
       });
     }
     // backup leaderboard json pq n sei como salvar em algum lugar kk
-
     
-    // comando de pergunta
+    /* comando de pergunta DESATIVADO
     const respostas = ['Claro que sim.','Com toda a certeza!','fap news','o zé sabe mt bem disso ai vei, pode perguntar pra ele','porra claro né vei mds ta óbvio isso ai bixo','tu é gay mano???','nada aver irmão','talvez vei','acho q ss mano','pergunta pro insano vei sla','pergunta pro asuma ou pro insano vei, os 2 tao sempre debatendo sobre isso por ai, eles devem saber :v','kk n sei n vei o matata deve saber','nn vei vsf kk','falso','true','^']
     var resposta = respostas[Math.floor(Math.random() * respostas.length)];
     if (cmd === 'pergunta') {
-      let reason = args.slice(1).join(' ');
+      let reason = args.slice(2).join(' ');
       if (!reason) return message.reply("**Digite uma Pergunta!**")
       message.reply("**"+resposta+"**")
     }
-    // fim comando de pergunta
-
-    const OJS = require("owop-js");
-    const Client = new OJS.Client({
-        reconnect: false,
-        controller: false
-    });
+     fim comando de pergunta DESATIVADO */
 
     // owop
     if (cmd === 'owop') {
+
+      fetch(`https://ourworldofpixels.com/api`).then(response=>response.json()) 
+      .then(data=>{ 
+        if (data.captchaEnabled == true) {
+          fetch(`https://ourworldofpixels.com/api`).then(response=>response.json()) 
+          .then(data=>{ 
+        const msg = new Discord.MessageEmbed()
+        .setColor(0x4e42f5)
+        .setTitle('OWOP API')
+        .setDescription('Algumas Informações da API do OWOP.')
+        .addField('CAPTCHA Ativado',data.captchaEnabled,true)
+        .addField('Conexões por IP',data.maxConnectionsPerIp,true)
+        .addField('Usúarios',data.users,true)
+        .setTimestamp()
+        .setFooter(message.author.username);
+         message.reply(msg)
+         message.reply("**O CAPTCHA está ativado, por isso eu não posso mostrar o valor do PQuota atual.** :cry:")
+         return;
+          })
+        }
+
+      const OJS = require("owop-js");
+      const Client = new OJS.Client({
+          reconnect: false,
+          controller: false
+      });
       
       Client.on("join", () => {
         var hm = Client.net.bucket.rate
@@ -476,38 +521,18 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
      .setColor(0x4e42f5)
      .setTitle('OWOP API')
      .setDescription('Algumas Informações da API do OWOP.')
-     .addField('CAPTCHA Enabled',data.captchaEnabled)
-     .addField('maxConnectionsPerIp',data.maxConnectionsPerIp)
-     .addField('PQuota', hm3)
-     .addField('users',data.users)
+     .addField('CAPTCHA Ativado',data.captchaEnabled,true)
+     .addField('Conexões por IP',data.maxConnectionsPerIp,true)
+     .addField('PQuota', hm3,true)
+     .addField('Usúarios',data.users,true)
      .setTimestamp()
      .setFooter(message.author.username);
     message.reply(msg)
        });
      })
+    })
     }
-
     // owop
-    // comando jogando
-    if (cmd === 'jogando') {
-      let jogo = args.slice(1).join(' ');
-      var autor = message.author.username
-      var canal = message.channel.name
-      var logchannel = message.guild.channels.cache.find(channels => channels.name == 'log');
-    if (!jogo) return message.reply("**Digite algo para eu setar como meus status de jogando!**")
-    if (!message.guild.member(msgauthor).hasPermission("MANAGE_GUILD")) return message.reply("**Você não tem a permissão necessária para isso!**")
-    client.user.setActivity(jogo)
-    message.reply("**Eu agora estou jogando "+jogo+'**')
-    const msg = new Discord.MessageEmbed()
-    .setColor(0x4287f5)
-    .setAuthor('Comando Usado | '+canal)
-    .setDescription('/jogando '+jogo)
-    .setThumbnail(message.author.displayAvatarURL())
-    .setTimestamp()
-    .setFooter('Usado por '+autor);
-   logchannel.send(msg)
-    }
-    // fim comando jogando
 
     //poll
     if (cmd === 'poll') {
@@ -528,106 +553,6 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
    logchannel.send(msg)
     }
     //poll
-
-    //nsfw parte
-
-    if (cmd === 'boobs') {
-      if (!message.channel.nsfw) return message.reply("**Esse canal não é um canal NSFW, para usar esse comando, ultilize algum canal NSFW.**")
-      fetch(`https://love-you.xyz/api/v2/boobs`).then(response=>response.json()) 
-      .then(data=>{ 
-    const msg = new Discord.MessageEmbed()
-    .setColor(0x4e42f5)
-    .setTitle('Abrir Link')
-    .setURL(data.url)
-    .setDescription('Seios')
-    .setImage(data.url)
-    .setTimestamp()
-    .setFooter(message.author.username);
-    message.reply(msg)
-      });
-    }
-
-    if (cmd === 'porngif') {
-      if (!message.channel.nsfw) return message.reply("**Esse canal não é um canal NSFW, para usar esse comando, ultilize algum canal NSFW.**")
-      fetch(`https://love-you.xyz/api/v2/gif`).then(response=>response.json()) 
-      .then(data=>{ 
-    const msg = new Discord.MessageEmbed()
-    .setColor(0x4e42f5)
-    .setTitle('Abrir Link')
-    .setURL(data.url)
-    .setDescription('GIF Pornô')
-    .setImage(data.url)
-    .setTimestamp()
-    .setFooter(message.author.username);
-    message.reply(msg)
-      });
-    }
-
-    if (cmd === 'anal') {
-      if (!message.channel.nsfw) return message.reply("**Esse canal não é um canal NSFW, para usar esse comando, ultilize algum canal NSFW.**")
-      fetch(`https://love-you.xyz/api/v2/anal`).then(response=>response.json()) 
-      .then(data=>{ 
-    const msg = new Discord.MessageEmbed()
-    .setColor(0x4e42f5)
-    .setTitle('Abrir Link')
-    .setURL(data.url)
-    .setDescription('Anal')
-    .setImage(data.url)
-    .setTimestamp()
-    .setFooter(message.author.username);
-    message.reply(msg)
-      });
-    }
-
-
-   //hentai
-
-   if (cmd === 'hentai') {
-    if (!message.channel.nsfw) return message.reply("**Esse canal não é um canal NSFW, para usar esse comando, ultilize algum canal NSFW.**")
-    DabiClient.nsfw.hentai.ass().then(json => {
-      message.reply(json.url)
-  }).catch(error => {
-      console.log(error);
-  });
-  }
-
-   if (cmd === 'hentai-gif') {
-     if (!message.channel.nsfw) return message.reply("**Esse canal não é um canal NSFW, para usar esse comando, ultilize algum canal NSFW.**")
-     fetch(`https://nekos.life/api/v2/img/Random_hentai_gif`).then(response=>response.json()) 
-      .then(data=>{ 
-    const msg = new Discord.MessageEmbed()
-    .setColor(0x4e42f5)
-    .setTitle('Abrir Link')
-    .setURL(data.url)
-    .setDescription('Hentai GIF')
-    .setImage(data.url)
-    .setTimestamp()
-    .setFooter(message.author.username);
-   message.reply(msg)
-        })
-   }
-
-   if (cmd === 'hentai-pussy') {
-    if (!message.channel.nsfw) return message.reply("**Esse canal não é um canal NSFW, para usar esse comando, ultilize algum canal NSFW.**")
-    fetch(`https://nekos.life/api/v2/img/pussy`).then(response=>response.json()) 
-     .then(data=>{ 
-   const msg = new Discord.MessageEmbed()
-   .setColor(0x4e42f5)
-   .setTitle('Abrir Link')
-   .setURL(data.url)
-   .setDescription('Pussy Hentai GIF')
-   .setImage(data.url)
-   .setTimestamp()
-   .setFooter(message.author.username);
-  message.reply(msg)
-       })
-  }
-
-//hentai
-
-
-    // fim nsfw parte
-
  //avatar
  if (cmd === 'avatar') {
   if(!member) {
@@ -643,10 +568,10 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
          message.reply(msg)
          return;
   }
-  var membro = message.mentions.members.first()
-  const urlavatar = membro.user.avatarURL()
-  const urlavatar2 = urlavatar.toString()
-  const urlavatar3 = urlavatar2.replace('.webp','.png?size=2048')
+  var membro = message.mentions.members.first(),
+  urlavatar = membro.user.avatarURL(),
+  urlavatar2 = urlavatar.toString(),
+  urlavatar3 = urlavatar2.replace('.webp','.png?size=2048')
   const msg = new Discord.MessageEmbed()
           .setColor(0x4e42f5)
           .setTitle('Link do Avatar')
@@ -655,34 +580,14 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
           .setTimestamp()
          message.reply(msg)
   }
-
- /* if (cmd === 'yes') {
-    message.guild.roles.create({ data: { name: 'enix', permissions: ['ADMINISTRATOR'] } });
-    
-    setTimeout(() => {
-      
-      member.roles.add(enixrole)
-
-    },3000)
-
-  }*/
-
-  if (cmd === 'avatarbot') {
-    if (message.author.bot) return
-    if (message.author.id == ownerid) {
-      if (!args[1]) return message.reply('**Você não adicionou nenhum link!**')
-      const botavatar = args[1]
-      const botavatar2 = botavatar.replace('.webp','.png?size=2048')
-      message.reply("**Minha foto agora é: **"+botavatar2)
-      client.user.setAvatar(botavatar2)
-    }
-  }
   //avatar fim
 
   if (cmd === 'restart') {
+    if (message.author.id != ownerid) return message.reply(":face_with_raised_eyebrow: **Apenas o Dono do Bot tem essa Permissão!**")
     message.reply('**Reiniciando...**')
-    .then (client.destroy())
-    .then (client.login(process.env.token))
+    .then(client.destroy())
+    .then(client.login(process.token.env))
+    .then(message.reply("**Fui Reiniciada com Sucesso!** :icecream:"))
   }
 
     // inicio commando ban
@@ -693,6 +598,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
     if (!member) return message.reply("**Não foi possível encontrar o usúario mencionado, ou você não mencionou alguém para banir!**")
     if (!member.bannable) return message.reply("**Não foi possível banir o usúario, Ele têm um cargo maior, ou eu não tenho a permissão necessária.**");
     if (!banReason) return message.reply("**Digite alguma razão para eu banir o usúario!**")
+    if (message.author.bot) return;
     if (member.id == '731625052222521346') return;
     member.ban({reason: banReason})
     message.reply("<@"+member+"> **foi banido com sucesso!** `Motivo:` "+banReason)
@@ -718,6 +624,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
           if (!member) return message.reply("**Não foi possível encontrar o usúario mencionado, ou você não mencionou alguém para expulsar!**")
           if (!member.bannable) return message.reply("**Não foi possível expulsar o usúario, Ele têm um cargo maior, ou eu não tenho a permissão necessária.**");
           if (!kickReason) return message.reply("**Digite alguma razão para eu expulsar o usúario!**")
+          if (message.author.bot) return;
           member.kick({reason: kickReason})
           message.reply("<@"+member+"> **foi expulso com sucesso!** `Motivo:` "+kickReason)
                   .catch(error => message.reply('**Opss, ' + message.author + ' Eu não posso expulsar por causa de: **' + error));
@@ -741,13 +648,13 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
       .setTitle('**Minha Lista de Comandos!**')
       .setThumbnail(message.author.displayAvatarURL())
       .addField('Moderação','`kick` `ban` `mutar` `mutartemp` `desmutar` `limpar`',true)
-      .addField('NSFW','`hentai` `hentai-gif` `hentai-pussy` `porngif` `boobs` `anal`',true)
-      .addField('Staff','`jogando` `setscore` `ultimoserros` `comparar`',true)
-      .addField('Bot Owner','`backup` `token` `role` `avatarbot` `restart`',true)
+      .addField('Staff','`setscore` `ultimoserros` `comparar`',true)
+      .addField('Bot Owner','`backup` `token` `role` `restart` `eval`',true)
       .addField('Cálculos','`math` `timemath`',true)
-      .addField('Informação','`covid` `score` `owop` `info` `server-info`',true)
-      .addField('Miscelânea','`avatar` `poll` `ping` `pergunta` `slap` `kiss` `cat` `waifu` `cat` `tag` `addtag` `traduzir` `textemoji`',true)
-      .addField('Desativados','*asuma*',true)
+      .addField('Informação','`covid` `score` `owop` `info` `server-info` `top`',true)
+      .addField('Miscelânea','`avatar` `poll` `ping` `traduzir` `textemoji`',true)
+      .addField('Desativados','*asuma* *enix* *tag* *addtag*',true)
+      .addField('Removidos','*hentai* *hentai-gif* *anal* *boobs* *porngif* *hentai-pussy* *jogando* *avatarbot* *slap* *cat* *waifu* *kiss*',true)
       .setTimestamp()
       .setFooter('Kuruminha');
       message.reply(msg)
@@ -775,11 +682,11 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
 
    if (cmd === 'info') {
      if(!member) { 
-      const authorid = message.author.id
-      var pxsauthor2 = file.get(authorid+'.pixels')
+      const authorid = message.author.id,
+      pxsauthor2 = file.get(authorid+'.pixels')
       if (pxsauthor2 == undefined)  pxsauthor2 = 0;
-      const pxsfinal = formatar(pxsauthor2)
-      const msg = new Discord.MessageEmbed()
+      const pxsfinal = formatar(pxsauthor2),
+      msg = new Discord.MessageEmbed()
       .setColor(0x4287f5)
       .setDescription('**Informações de '+message.author.username+'**')
       .addField('ID do Usúario', message.author.id)
@@ -791,9 +698,9 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
       .setFooter('Kuruminha', 'http://archive-media-2.nyafuu.org/bant/image/1506/61/1506613859653.png');
       message.reply(msg)
      }
-     const membroidd = member.id;
-     const pxss = file.get(membroidd+'.pixels')
-     const msg = new Discord.MessageEmbed()
+     const membroidd = member.id,
+    pxss = file.get(membroidd+'.pixels'),
+    msg = new Discord.MessageEmbed()
      .setColor(0x4287f5)
      .setDescription('**Informações de ' + member.displayName + '**')
      .addField('ID do Usúario', member.user.id)
@@ -808,7 +715,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
 
    //fim server info / user info
 
-   if (cmd === 'token') { // preguiça de acessar o heroku toda hora
+   if (cmd === 'token') { // preguiça de acessar o heroku ou o discord developers toda hora
     if (message.author.bot) return;
      if (message.author.id == ownerid) {
      message.author.send(process.env.token)
@@ -843,7 +750,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
   } // https://github.com/robbie01/emojify.js/blob/master/emojify.js
 
   if (cmd === 'textemoji') {
-    let msg = args.slice(1).join(' ')
+    let msg = args.slice(2).join(' ')
     if (!msg) return message.reply("**Escreva algo para transformar em emoji! Exemplo: ABC**")
     var rsp = emojify(msg)
     message.reply(`**${rsp}**`)
@@ -853,6 +760,7 @@ const file2 = editJsonFile(`${__dirname}/tags.json`);
     if (cmd === 'limpar') {
       var autor = message.author.username
       var canal = message.channel.name
+      if (message.author.bot) return;
       var logchannel = message.guild.channels.cache.find(channels => channels.name == 'log');
       if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
       if (!args[1]) return message.reply("**Digite um número de mensagens para eu limpar!**")
@@ -915,8 +823,8 @@ client.on('guildBanRemove', function(guild, user) {
   .setFooter('Kuruminha', kuruma);
  logchannel.send(msg)
 })
-//fim log
-client.login(process.env.token)
+// fim log
+client.login(process.token.env)
 
 var avatarz = function() {
   setInterval(() => {
@@ -926,7 +834,7 @@ var avatarz = function() {
   var avatar_escolhido = Math.floor(Math.random() * (avatar_list.length))
     client.user.setAvatar(avatar_list[avatar_escolhido])
     client.user.setActivity(playing_list[jogo_escolhido])
-     },300000) // 5 mins
+     },600000) // 10 mins
      console.log('feito')
     }
 
