@@ -1,6 +1,6 @@
 ﻿const Discord = require('discord.js'),
 client = new Discord.Client({ disableEveryone: true });
-prefix = '/';
+var prefix = '/';
 const fetch = require('node-fetch');
 const ms = require('ms')
 var fs = require('fs');
@@ -34,7 +34,7 @@ function saveDB(user, pixels) {
       file.set(user.id, {pixels: pixels, 'id': `<@${user.id}>`})
       file.save()
 }
-
+ /*
     if (cmd === 'pz') {
       if (!args[1]) return message.reply("**Digite a Coordenada X!**")
       if (!args[2]) return message.reply("**Digite a Coordenada Y!**")
@@ -53,7 +53,7 @@ function saveDB(user, pixels) {
               });
           },7000)
       })();
-    }
+    } vai se fuder github filho da puta do caralho bando de riquinho q n aceita a porra de uma pasta de mais de 100mb*/
 
     if (cmd === 'setscore') {
       if (!member) return message.reply('**Você não mencionou ninguém ou a pessoa não está nesse servidor!**')
@@ -63,6 +63,13 @@ function saveDB(user, pixels) {
       const value = parseInt(args[2])
        saveDB(membrao, value)
       message.reply("**O Score de "+member.displayName+" agora é "+formatar(args[2])+' pixels!**')
+    }
+
+    if (cmd === 'prefix') {
+      if (message.author.bot) return;
+      if (message.author.id != ownerid) return;
+      if (!args[1]) return message.reply("n")
+      prefix = args[1]
     }
 
     if (cmd === 'top') {
@@ -627,12 +634,12 @@ desativado */
           if (message.author.bot) return;
           member.kick({reason: kickReason})
           message.reply("<@"+member+"> **foi expulso com sucesso!** `Motivo:` "+kickReason)
-                  .catch(error => message.reply('**Opss, ' + message.author + ' Eu não posso expulsar por causa de: **' + error));
+                  .catch(error => message.reply('**Opss, ' + message.author + ' Eu não posso expulsar esse usúario por causa de: **' + error));
                   const msg = new Discord.MessageEmbed()
                   .setColor(0xEE2A00)
                   .setAuthor('Expulso')
                   .setDescription('<@' + member.user.id + '>')
-                  .addField('Expulsado Por', '<@'+message.author.id+'>')
+                  .addField('Expulso Por', '<@'+message.author.id+'>')
                   .addField('Motivo', kickReason)
                   .setThumbnail(member.user.displayAvatarURL())
                   .setTimestamp()
