@@ -373,7 +373,7 @@ function saveDB(user, pixels) {
         if (!args[1]) return message.reply("**Digite algo para dar eval!**")
         const toEval = args.slice(2).join(" ");
         if (toEval.includes("token")) return message.reply("gay");
-        if (toEval.includes("process.token.env")) return message.reply("gay");
+        if (toEval.includes("process.env.token")) return message.reply("gay");
         if (toEval.includes("env")) return message.reply("gay");
         const fo = 'return '
         const evaluado = eval(fo+toEval);
@@ -586,7 +586,7 @@ desativado */
     if (message.author.id != ownerid) return message.reply(":face_with_raised_eyebrow: **Apenas o Dono do Bot tem essa Permissão!**")
     message.reply('**Reiniciando...**')
     .then(client.destroy())
-    .then(client.login(process.token.env))
+    .then(client.login(process.env.token))
     .then(message.reply("**Fui Reiniciada com Sucesso!** :icecream:"))
   }
 
