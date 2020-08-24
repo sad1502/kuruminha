@@ -843,7 +843,7 @@ var avatarz = function() {
   var jogo_escolhido = Math.floor(Math.random() * (playing_list.length))
     client.user.setAvatar(`./avatar/${chosenFile}`)
     client.user.setActivity(playing_list[jogo_escolhido])
-     },60000) // 10 mins
+     },600000) // 10 mins
      console.log('feito')
     }
 
