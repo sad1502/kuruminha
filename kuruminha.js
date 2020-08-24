@@ -78,6 +78,7 @@ function saveDB(user, pixels) {
             .map(v => `${v[1].pixels} - ${v[1].id}`)
             .slice(0, 10)
             .sort((a, b) => b.split(" - ")[0] - a.split(" - ")[0])
+        
             
 
         // aprendiz do yandere dev
@@ -365,29 +366,30 @@ function saveDB(user, pixels) {
 
       // math
       if (cmd === 'math') {
-      let argumentos = args.slice(2).join(' ');
+      let argumentos = args.slice(1).join(' ');
+      if (message.author.bot) return;
       if (!argumentos) return message.reply("**Indique uma Equação!**")
       const { evalExpression, tokenize, Token, evalTokens } = require('@hkh12/node-calc');
       const resposta = evalExpression(argumentos)
       message.reply("**"+resposta+"**")
-
       }
       // fim math
 
       if (cmd === 'eval') {
-        if (!message.author.id == ownerid) return message.reply("**Apenas o dono do bot pode usar esse comando!**")
+        const util = require('util');
+        const beautify = require('beautify');
+        if (message.author.id !== ownerid) return message.reply("**Apenas o dono do bot pode usar esse comando!**");
         if (message.author.bot) return;
-        if (!args[1]) return message.reply("**Digite algo para dar eval!**")
-        const toEval = args.slice(2).join(" ");
+        const toEval = args.slice(1).join(' ');
+        if (!toEval) return message.reply("**Digite algo para dar eval!**")
         if (toEval.includes("token")) return message.reply("gay");
         if (toEval.includes("process.env.token")) return message.reply("gay");
         if (toEval.includes("env")) return message.reply("gay");
-        const fo = 'return '
-        const evaluado = eval(fo+toEval);
 
+        var evaluado = eval(toEval);
         const embed = new Discord.MessageEmbed()
         .setTitle('Code Eval')
-        .addField('Resultado', evaluado, true)
+        .addField("Código:", `\`\`\`js\n${beautify(args.slice(1).join(' '), { format: "js" })}\n\`\`\``)
         message.channel.send(embed)
       }
 
@@ -590,7 +592,7 @@ desativado */
   //avatar fim
 
   if (cmd === 'restart') {
-    if (message.author.id != ownerid) return message.reply(":face_with_raised_eyebrow: **Apenas o Dono do Bot tem essa Permissão!**")
+    if (message.author.id != ownerid) return message.reply(":face_with_raised_eyebrow: **Apenas o Dono do Bot pode usar esse comando!**")
     message.reply('**Reiniciando...**')
     .then(client.destroy())
     .then(client.login(process.env.token))
@@ -835,13 +837,13 @@ client.login(process.env.token)
 
 var avatarz = function() {
   setInterval(() => {
-  const avatar_list = ['https://pbs.twimg.com/profile_images/1272552144873435136/N0sRaw1x.jpg','https://pbs.twimg.com/media/Dz8hH3mWwAcg6Du.jpg','https://julay.world/.media/bb0357c2944dd9a0f3b762517ffa8f16-imagepng.png','https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSooJ8Um28Wd9i0YtY7vHwEihGZbD0ol_rKTQ&usqp=CAU','https://i.pinimg.com/originals/9c/92/92/9c92929e51d32f9acbbe85aeb3f4bc81.png','https://i.4pcdn.org/pol/1540934623817.png','https://i.kym-cdn.com/photos/images/original/001/540/753/307.png','https://archive-media-0.nyafuu.org/bant/image/1497/92/1497929564966.png','http://archive-media-2.nyafuu.org/bant/image/1495/33/1495332295975.png','http://archive-media-2.nyafuu.org/bant/image/1540/84/1540845552519.png','http://archive-media-2.nyafuu.org/bant/image/1537/29/1537296296591.jpg','http://archive-media-2.nyafuu.org/bant/image/1506/61/1506613859653.png','https://archive-media-0.nyafuu.org/bant/image/1501/78/1501786785643.png','https://archive-media-0.nyafuu.org/bant/image/1528/73/1528738800655.jpg','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJwYCGomggdQIMw0W4ak4bNMlPGs7rPEdWj2myWnt2Y20q1Ro&s','http://archive-media-2.nyafuu.org/bant/image/1539/58/1539585314613.png','https://2eu.funnyjunk.com/thumbnails/comments/This+is+all+there+is+to+it+its+not+cropped+_a2e5c58285b13f9e7665589574d956b2.jpg','https://i.4pcdn.org/pol/1486083695126s.jpg','https://pbs.twimg.com/profile_images/1193034891031650304/DufZJEwy_400x400.jpg','http://archive-media-2.nyafuu.org/bant/image/1506/19/1506193025153.png','https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/b196a2a9-2c95-421f-bb1f-817f40f4fddf/d6bixi9-881b72d0-d2b1-48c2-8e2c-cce99c194f6b.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvYjE5NmEyYTktMmM5NS00MjFmLWJiMWYtODE3ZjQwZjRmZGRmXC9kNmJpeGk5LTg4MWI3MmQwLWQyYjEtNDhjMi04ZTJjLWNjZTk5YzE5NGY2Yi5qcGcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.W-erPiKB-praxmVgnQAqcr2HH7NiaaiF8TejYRGU6Cg']
+    var files = fs.readdirSync('./avatar/')
+    var chosenFile = files[Math.floor(Math.random() * files.length)] // https://linustechtips.com/main/topic/949042-pick-random-image-from-folder-in-nodejs/?tab=comments#comment-11591158
   const playing_list = [`${client.users.cache.size} usúarios`,'PixelZone','PixelPlanet','PixelCanvas','PxlsPlace','PixelAnarchy','OurWorldofPixels','PixelSpace','PixelNow','Discord','Guilded','Overwatch','Fortnite','League of Legends','Minecraft','Five Nights at Freddy`s','Valorant','Nada!']
   var jogo_escolhido = Math.floor(Math.random() * (playing_list.length))
-  var avatar_escolhido = Math.floor(Math.random() * (avatar_list.length))
-    client.user.setAvatar(avatar_list[avatar_escolhido])
+    client.user.setAvatar(`./avatar/${chosenFile}`)
     client.user.setActivity(playing_list[jogo_escolhido])
-     },600000) // 10 mins
+     },60000) // 10 mins
      console.log('feito')
     }
 
