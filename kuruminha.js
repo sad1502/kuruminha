@@ -460,9 +460,9 @@ function saveDB(user, pixels) {
       }
 
       if (cmd === 'template') {
-        var hm2 = fs.readFileSync('./templates.json', 'utf8')
-        hm2 = JSON.parse(hm2)
-        if(!hm2.hasOwnProperty(`${args[1]}`)) return message.reply("**Esta template não existe!**")
+        var xd = file2.get('templates')
+        var xd2 = Object.keys(xd)
+        if (!xd2+`.${args[1]}`) return message.reply("**Esta template não existe!**")
         if (!args[1]) return message.reply("**Digite o nome de uma template!**")
         var respostinha = file2.get('templates.'+args[1]+'.originalTemplateUrl')
         var respostinha2 = file2.get('templates.'+args[1]+'.channelToSendMessages')
@@ -501,7 +501,7 @@ function saveDB(user, pixels) {
       if (message.author.bot) return;
       if (message.author.id != ownerid) return;
       message.reply("**Backup enviado!**")
-      message.author.send("**Backup dos Arquivos: Leaderboard.json, Kuruminha.js, Tags.json e ultimos_erros.txt!**", {
+      message.author.send("**Backup**", {
         files: [
           "./leaderboard.json",
           "./templates.json",
