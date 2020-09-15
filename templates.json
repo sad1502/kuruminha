@@ -1,12 +1,1 @@
-{
-  "templates": {
-    "finlandesa": {
-      "originalTemplateUrl": "https://cdn.discordapp.com/attachments/737110934979477575/755462457253691583/1930_3775.png",
-      "channelToSendMessages": "737110934979477575"
-    },
-    "yoruichi": {
-      "originalTemplateUrl": "https://cdn.discordapp.com/attachments/737110934979477575/755468100257841314/yoruichi.png",
-      "channelToSendMessages": "737110934979477575"
-    }
-  }
-}
+{}
