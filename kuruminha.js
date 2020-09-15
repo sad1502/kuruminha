@@ -459,20 +459,6 @@ function saveDB(user, pixels) {
         message.reply(embed)
       }
 
-      if (cmd === 'template') {
-        if (!args[1]) return message.reply("**Digite o nome de uma template!**")
-        file2.read();
-        var xd = file2.get('templates')
-        if (!xd+`.${args[1]}`) return message.reply("**Esta template não existe!**")
-        var respostinha = file2.get('templates.'+args[1]+'.originalTemplateUrl')
-        var respostinha2 = file2.get('templates.'+args[1]+'.channelToSendMessages')
-        const embed = new Discord.MessageEmbed()
-        .setTitle(`${args[1]}`)
-        .setImage(respostinha)
-        .addField(':newspaper: ID Canal de Updates',respostinha2)
-        message.reply(embed)
-      }
-
   //inicio ping
   if (cmd === 'ping') {
     var author = '<@'+message.author+'>'
