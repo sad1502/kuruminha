@@ -451,6 +451,7 @@ function saveDB(user, pixels) {
 
       if (cmd === 'templates') {
         var lmao = file2.get('templates')
+        if (!lmao) return message.reply("nenhuma temp kk agay.")
         var lamo2 = Object.keys(lmao)
 
         const embed = new Discord.MessageEmbed()
@@ -461,6 +462,7 @@ function saveDB(user, pixels) {
 
       if (cmd === 'template') {
         var xd = file2.get('templates')
+        if (!xd) return message.reply("kk goy semp temp")
         var xd2 = Object.keys(xd)
         if (!xd2+`.${args[1]}`) return message.reply("**Esta template não existe!**")
         if (!args[1]) return message.reply("**Digite o nome de uma template!**")
