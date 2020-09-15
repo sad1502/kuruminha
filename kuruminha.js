@@ -459,6 +459,20 @@ function saveDB(user, pixels) {
         message.reply(embed)
       }
 
+      if (cmd === 'template') {
+        var hm2 = fs.readFileSync('./templates.json', 'utf8')
+        hm2 = JSON.parse(hm2)
+        if(!hm2.hasOwnProperty(`${args[1]}`)) return message.reply("**Esta template não existe!**")
+        if (!args[1]) return message.reply("**Digite o nome de uma template!**")
+        var respostinha = file2.get('templates.'+args[1]+'.originalTemplateUrl')
+        var respostinha2 = file2.get('templates.'+args[1]+'.channelToSendMessages')
+        const embed = new Discord.MessageEmbed()
+        .setTitle(`${args[1]}`)
+        .setImage(respostinha)
+        .addField(':newspaper: ID Canal de Updates',respostinha2)
+        message.reply(embed)
+      }
+
   //inicio ping
   if (cmd === 'ping') {
     var author = '<@'+message.author+'>'
@@ -482,12 +496,24 @@ function saveDB(user, pixels) {
     // fim comando de trocar o nome do asuma
 
     // backup leaderboard json pq n sei como salvar em algum lugar kk
+    setInterval(() => {
+      var logchannel = message.guild.channels.cache.find(channels => channels.name == 'log');
+      logchannel.send("hora do backup")
+      message.author.send("**Backup dos Arquivos: Leaderboard.json, Kuruminha.js, Tags.json e ultimos_erros.txt!**", {
+        files: [
+          "./leaderboard.json",
+          "./templates.json",
+          "./kuruminha.js",
+          "./stats/ultimos_erros.txt"
+        ]
+      });
+    },1800000) // backup each 30 mins
     if (cmd === 'backup') {
       if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
       if (message.author.bot) return;
       if (message.author.id != ownerid) return;
       message.reply("**Backup enviado!**")
-      message.author.send("**Backup**", {
+      message.author.send("**Backup dos Arquivos: Leaderboard.json, Kuruminha.js, Tags.json e ultimos_erros.txt!**", {
         files: [
           "./leaderboard.json",
           "./templates.json",
