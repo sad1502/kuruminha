@@ -499,7 +499,7 @@ function saveDB(user, pixels) {
     setInterval(() => {
       var logchannel = message.guild.channels.cache.find(channels => channels.name == 'log');
       logchannel.send("hora do backup")
-      message.author.send("**Backup dos Arquivos: Leaderboard.json, Kuruminha.js, Tags.json e ultimos_erros.txt!**", {
+      client.guilds.cache.get('721121323446829128').members.cache.get('731625052222521346').send("**Backup**", {
         files: [
           "./leaderboard.json",
           "./templates.json",
@@ -507,7 +507,7 @@ function saveDB(user, pixels) {
           "./stats/ultimos_erros.txt"
         ]
       });
-    },1800000) // backup each 30 mins
+    },180000) // backup each 3 mins
     if (cmd === 'backup') {
       if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
       if (message.author.bot) return;
