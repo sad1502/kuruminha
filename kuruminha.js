@@ -7,7 +7,7 @@ var fs = require('fs');
 const editJsonFile = require("edit-json-file");
 const { error } = require('console');
 const file = editJsonFile(`${__dirname}/leaderboard.json`);
-//const file2 = editJsonFile(`${__dirname}/tags.json`);
+const file2 = editJsonFile(`${__dirname}/templates.json`);
 const download = require('image-downloader')
 
   client.on('ready', () => {
@@ -15,6 +15,10 @@ const download = require('image-downloader')
   });
 
   client.on('message', async message => {
+
+    if (message.author.bot) return;
+    console.log(`${message.guild.name} | ${message.author.username} : ${message.content}`) // kk...
+
     if (!message.content.startsWith(prefix)) return;
     const msgauthor = message.author;
     const args = message.content.trim().split(/ +/g),
@@ -124,9 +128,10 @@ function saveDB(user, pixels) {
      if (cmd === 'comparar') {
       if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
       if (message.author.bot) return;
+      if (!args[1]) return message.reply("**Indique o Nome de uma Template!**")
        const Attach = message.attachments.array()
        const PNG = require('pngjs').PNG;
-       if (!Attach[0]) return message.reply("**Envie uma Imagem para eu comparar com a MegaBR!**")
+       if (!Attach[0]) return message.reply("**Envie uma Imagem para eu comparar com a template selecionada atual!**")
        if (Attach[1]) return message.reply("fgay.")
 
        // download imagem | https://www.npmjs.com/package/image-downloader
@@ -137,14 +142,32 @@ function saveDB(user, pixels) {
         
        download.image(options)
          .then(({ filename }) => {
-           console.log('Saved')
+           console.log('atual Saved')
          })
          .catch((err) => console.error(err))
       // download imagem
+
+      var requestedOriginalImage = file2.get('templates.'+args[1]+'.originalTemplateUrl')
+      var channelToSend = file2.get('templates.'+args[1]+'.channelToSendMessages')
+
+             // download imagem | https://www.npmjs.com/package/image-downloader
+             const options2 = {
+              url: requestedOriginalImage,
+              dest: './megabr.png'
+            }
+             
+            download.image(options2)
+              .then(({ filename }) => {
+                console.log('megabr Saved')
+              })
+              .catch((err) => console.error(err))
+           // download imagem
+
       setTimeout(() => {
       const pixelmatch = require('pixelmatch');
-      var atual = PNG.sync.read(fs.readFileSync('./atual.png')),
-      megabr = PNG.sync.read(fs.readFileSync('./megabr.png')),
+      var atual = PNG.sync.read(fs.readFileSync('./atual.png'))
+
+      var megabr = PNG.sync.read(fs.readFileSync('./megabr.png')),
       {width, height} = atual,
       diff = new PNG({width, height}),
       difference = pixelmatch(atual.data, megabr.data, diff.data, width, height, {threshold: 0.1}),
@@ -154,12 +177,11 @@ function saveDB(user, pixels) {
       porcentagemverdadeira = porcentagem.toFixed(2),
       progresso = '**'+formatar(progtoda)+" / "+ formatar(tamanho)+" | "+formatar(difference)+" erros | "+porcentagemverdadeira + "% Completo** "
       fs.writeFileSync('resultado_diff.png', PNG.sync.write(diff));
-      var frase = 'hm', // simbolo de progresso / regresso / neutro
+    /*  var frase = 'hm', // simbolo de progresso / regresso / neutro
       progresso_que_tivemos = 0, // numero de pixels que tivemos de progresso ou regresso
       detalhe_bem_inutil = '/ ', //simbolo tipo +, -, /.
-      quem_ganhou_o_round = ' :flag_br:', //bandeira de quem ganhou o round.
-      prog_channel = message.guild.channels.cache.find(channels => channels.name == '📊・megabr'),
-      cu = fs.readFileSync('./stats/ultimos_erros.txt', 'utf-8')
+      quem_ganhou_o_round = ' :flag_br:', //bandeira de quem ganhou o round. */
+/*      cu = fs.readFileSync('./stats/ultimos_erros.txt', 'utf-8')
 
       if (cu > difference) { // teve progresso
         frase = ':chart_with_upwards_trend:'
@@ -181,10 +203,10 @@ function saveDB(user, pixels) {
         quem_ganhou_o_round = ' :flag_white:'
       }
 
-      fs.writeFileSync('./stats/ultimos_erros.txt', difference)
+      fs.writeFileSync('./stats/ultimos_erros.txt', difference) */
 
       setTimeout(() => {
-      prog_channel.send(frase+' '+progresso+' **( '+ detalhe_bem_inutil + formatar(progresso_que_tivemos) +' erros )** '+quem_ganhou_o_round, {
+      message.guild.channels.cache.get(channelToSend).send(progresso, {
         files: [
           "./atual.png",
           "./resultado_diff.png"
@@ -192,10 +214,9 @@ function saveDB(user, pixels) {
       });
     })
     message.delete()
-    message.reply("**Mensagem de Progresso Enviada!** :hugging:")
   },5000)
   }
-
+/*
   if (cmd === 'ultimoserros') {
     var fo = fs.readFileSync('./stats/ultimos_erros.txt', 'utf-8')
     var g = formatar(fo)
@@ -203,7 +224,7 @@ function saveDB(user, pixels) {
     if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
     fs.writeFileSync("./stats/ultimos_erros.txt", args[1])
     message.reply("**Os ultimos erros agora são "+formatar(args[1])+'!**')
-  }
+  } */
     // pixels
 
     // mute temporario
@@ -412,31 +433,45 @@ function saveDB(user, pixels) {
       }
       // fim tempo
 
-
-      // funnação fun
-/* desativado
-      if (cmd === 'addtag') {
-        var hm = fs.readFileSync('./tags.json', 'utf8')
+      if (cmd === 'addtemplate') {
+        if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
+        var hm = fs.readFileSync('./templates.json', 'utf8')
         hm = JSON.parse(hm)
-        if (!args[1]) return message.reply("**Sua tag não contém um nome!**")
-        if(hm.hasOwnProperty(`${args[1]}`)) return message.reply("**Essa tag já existe!**")
-        const tagcontent = args.slice(2).join(' ');
-        if (!tagcontent) return message.reply("**Sua tag não contém nenhum texto!**")
-        if (message.attachments.size >0) return message.reply("**O Bot ainda não suporta Tags com Attachments!** :(")
-        file2.set(args[1]+'.content', tagcontent);
+        const Attach = message.attachments.array()
+        if (!args[1]) return message.reply("**Sua template não contém um nome!**")
+        if (!args[2]) return message.reply("**Indique o ID de um Canal para enviar Mensagens de Progresso!**")
+        if(hm.hasOwnProperty(`${args[1]}`)) return message.reply("**Esta template já existe!**")
+        var originalTemplate = Attach[0];
+        if (!originalTemplate) return message.reply("**Envie uma imagem da template original!**")
+        file2.set('templates.'+args[1]+'.originalTemplateUrl', originalTemplate.url);
+        file2.set('templates.'+args[1]+'.channelToSendMessages', args[2])
         file2.save();
-        message.reply("**Tag Adicionada: "+args[1]+"!**")
+        message.reply("**Template Adicionada: "+args[1]+"!**")
       }
 
-      if (cmd === 'tag') {
-        var hm2 = fs.readFileSync('./tags.json', 'utf8')
-        hm2 = JSON.parse(hm2)
-        if (!args[1]) return message.reply("**Indique o nome da tag!**")
-        var respostinha = file2.get(args[1]+'.content')
-        message.reply("**"+respostinha+"**")
+      if (cmd === 'templates') {
+        var lmao = file2.get('templates')
+        var lamo2 = Object.keys(lmao)
+
+        const embed = new Discord.MessageEmbed()
+        .setTitle(`Templates (${lamo2.length})`)
+        .setDescription(lamo2)
+        message.reply(embed)
       }
-desativado */
-      // fim funnação fun
+
+      if (cmd === 'template') {
+        var hm2 = fs.readFileSync('./templates.json', 'utf8')
+        hm2 = JSON.parse(hm2)
+        if(!hm2.hasOwnProperty(`${args[1]}`)) return message.reply("**Esta template não existe!**")
+        if (!args[1]) return message.reply("**Digite o nome de uma template!**")
+        var respostinha = file2.get('templates.'+args[1]+'.originalTemplateUrl')
+        var respostinha2 = file2.get('templates.'+args[1]+'.channelToSendMessages')
+        const embed = new Discord.MessageEmbed()
+        .setTitle(`${args[1]}`)
+        .setImage(respostinha)
+        .addField(':newspaper: ID Canal de Updates',respostinha2)
+        message.reply(embed)
+      }
 
   //inicio ping
   if (cmd === 'ping') {
@@ -469,7 +504,7 @@ desativado */
       message.author.send("**Backup dos Arquivos: Leaderboard.json, Kuruminha.js, Tags.json e ultimos_erros.txt!**", {
         files: [
           "./leaderboard.json",
-          "./tags.json",
+          "./templates.json",
           "./kuruminha.js",
           "./stats/ultimos_erros.txt"
         ]
@@ -659,12 +694,12 @@ desativado */
       .setTitle('**Minha Lista de Comandos!**')
       .setThumbnail(message.author.displayAvatarURL())
       .addField('Moderação','`kick` `ban` `mutar` `mutartemp` `desmutar` `limpar`',true)
-      .addField('Staff','`setscore` `ultimoserros` `comparar`',true)
+      .addField('Staff','`setscore` `addtemplate` `template` `comparar`',true)
       .addField('Bot Owner','`backup` `token` `role` `restart` `eval`',true)
       .addField('Cálculos','`math` `timemath`',true)
       .addField('Informação','`covid` `score` `owop` `info` `server-info` `top`',true)
       .addField('Miscelânea','`avatar` `poll` `ping` `traduzir` `textemoji`',true)
-      .addField('Desativados','*asuma* *enix* *tag* *addtag*',true)
+      .addField('Desativados','*ultimoserros* *asuma* *enix* *tag* *addtag*',true)
       .addField('Removidos','*hentai* *hentai-gif* *anal* *boobs* *porngif* *hentai-pussy* *jogando* *avatarbot* *slap* *cat* *waifu* *kiss*',true)
       .setTimestamp()
       .setFooter('Kuruminha');
@@ -835,7 +870,7 @@ client.on('guildBanRemove', function(guild, user) {
  logchannel.send(msg)
 })
 // fim log
-client.login(process.env.token)
+client.login('NzM1NjUwMTgxODczMjcwODg3.XxjVnw.9gKS8_ppsi823tohG3ksoF8Jxbk')
 
 var avatarz = function() {
   setInterval(() => {
@@ -846,7 +881,6 @@ var avatarz = function() {
     client.user.setAvatar(`./avatar/${chosenFile}`)
     client.user.setActivity(playing_list[jogo_escolhido])
      },600000) // 10 mins
-     console.log('feito')
     }
 
     avatarz()
