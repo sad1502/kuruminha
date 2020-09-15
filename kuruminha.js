@@ -870,7 +870,7 @@ client.on('guildBanRemove', function(guild, user) {
  logchannel.send(msg)
 })
 // fim log
-client.login('NzM1NjUwMTgxODczMjcwODg3.XxjVnw.9gKS8_ppsi823tohG3ksoF8Jxbk')
+client.login(process.env.token)
 
 var avatarz = function() {
   setInterval(() => {
