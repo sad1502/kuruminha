@@ -4,11 +4,7 @@ var prefix = '/';
 const fetch = require('node-fetch');
 const ms = require('ms')
 var fs = require('fs');
-const editJsonFile = require("edit-json-file");
 const { error } = require('console');
-const file = editJsonFile(`${__dirname}/leaderboard.json`);
-const file2 = editJsonFile(`${__dirname}/templates.json`);
-const download = require('image-downloader')
 
   client.on('ready', () => {
     console.log(`Bot Iniciado | ${client.user.tag}!`);
@@ -32,12 +28,6 @@ const download = require('image-downloader')
     enixrole = message.guild.roles.cache.find(r => r.name === 'enix'),
     ownerid = '731625052222521346'
 
-// pixels
-
-function saveDB(user, pixels) {
-      file.set(user.id, {pixels: pixels, 'id': `<@${user.id}>`})
-      file.save()
-}
  /*
     if (cmd === 'pz') {
       if (!args[1]) return message.reply("**Digite a Coordenada X!**")
@@ -59,175 +49,12 @@ function saveDB(user, pixels) {
       })();
     } vai se fuder github filho da puta do caralho bando de riquinho q n aceita a porra de uma pasta de mais de 100mb*/
 
-    if (cmd === 'setscore') {
-      if (!member) return message.reply('**Você não mencionou ninguém ou a pessoa não está nesse servidor!**')
-      if (!args[2]) return message.reply('**Digite um valor de score!**')
-      if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
-      const membrao = member;
-      const value = parseInt(args[2])
-       saveDB(membrao, value)
-      message.reply("**O Score de "+member.displayName+" agora é "+formatar(args[2])+' pixels!**')
-    }
-
     if (cmd === 'prefix') {
       if (message.author.bot) return;
       if (message.author.id != ownerid) return;
       if (!args[1]) return message.reply("n")
       prefix = args[1]
     }
-
-    if (cmd === 'top') {
-        var users = require(`./leaderboard.json`);
-        var leadarray = Object.entries(users)
-            .map(v => `${v[1].pixels} - ${v[1].id}`)
-            .slice(0, 10)
-            .sort((a, b) => b.split(" - ")[0] - a.split(" - ")[0])
-        
-            
-
-        // aprendiz do yandere dev
-            if(leadarray[0] == undefined) leadarray[0] = '`Ninguém`'
-            if(leadarray[1] == undefined) leadarray[1] = '`Ninguém`'
-            if(leadarray[2] == undefined) leadarray[2] = '`Ninguém`'
-            if(leadarray[3] == undefined) leadarray[3] = '`Ninguém`'
-            if(leadarray[4] == undefined) leadarray[4] = '`Ninguém`'
-            if(leadarray[5] == undefined) leadarray[5] = '`Ninguém`'
-            if(leadarray[6] == undefined) leadarray[6] = '`Ninguém`'
-            if(leadarray[7] == undefined) leadarray[7] = '`Ninguém`'
-            if(leadarray[8] == undefined) leadarray[8] = '`Ninguém`'
-            if(leadarray[9] == undefined) leadarray[9] = '`Ninguém`'
-
-        leadarray[0] = ':first_place: | '+leadarray[0]+'\n'
-        leadarray[1] = ':second_place: | '+leadarray[1]+'\n'
-        leadarray[2] = ':third_place: | '+leadarray[2]+'\n'
-        leadarray[3] = ':medal: | '+leadarray[3]+'\n'
-        leadarray[4] = ':medal: | '+leadarray[4]+'\n'
-        leadarray[5] = ':medal: | '+leadarray[5]+'\n'
-        leadarray[6] = ':medal: | '+leadarray[6]+'\n'
-        leadarray[7] = ':medal: | '+leadarray[7]+'\n'
-        leadarray[8] = ':medal: | '+leadarray[8]+'\n'
-        leadarray[9] = ':medal: | '+leadarray[9]+'\n'
-        // aprendiz do yandere dev
-
-        var embed = new Discord.MessageEmbed()
-        .setTitle(":busts_in_silhouette: Pixels Leaderboard - Top 10")
-        .setDescription(leadarray)
-        .setThumbnail('https://www.bestswim.com.br/wp-content/uploads/2017/08/top-10-films.jpg')
-        message.channel.send(embed)
-    }
-
-    if (cmd === 'score') {
-      if (!member) return message.reply('**Você não mencionou ninguém ou a pessoa não está nesse servidor!**')
-      if (member.bot) return;
-      const membroid = member.id;
-      const pxs = file.get(membroid+'.pixels')
-      if (pxs == undefined) return message.reply('**'+member.displayName+' colocou um total de 0 pixels!**')
-      message.reply('**'+member.displayName+' colocou um total de '+formatar(pxs)+' pixels!**')
-    }
-
-     if (cmd === 'comparar') {
-      if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
-      if (message.author.bot) return;
-      if (!args[1]) return message.reply("**Indique o Nome de uma Template!**")
-       const Attach = message.attachments.array()
-       if (!Attach[0]) return message.reply("**Envie uma Imagem para eu comparar com a template selecionada atual!**")
-       if (Attach[1]) return message.reply("só uma imagem, gay.")
-       const PNG = require('pngjs').PNG;
-       var requestedOriginalImage = file2.get('templates.'+args[1]+'.originalTemplateUrl')
-       if (!requestedOriginalImage) return message.reply("get stick bugged lol")
-
-       // download imagem | https://www.npmjs.com/package/image-downloader
-       const options = {
-         url: Attach[0].url,
-         dest: './atual.png'
-       }
-        
-       download.image(options)
-         .then(({ filename }) => {
-           console.log('atual Saved')
-         })
-         .catch((err) => console.error(err))
-      // download imagem
-
-      var channelToSend = file2.get('templates.'+args[1]+'.channelToSendMessages')
-
-             // download imagem | https://www.npmjs.com/package/image-downloader
-             const options2 = {
-              url: requestedOriginalImage,
-              dest: './megabr.png'
-            }
-             
-            download.image(options2)
-              .then(({ filename }) => {
-                console.log('megabr Saved')
-              })
-              .catch((err) => console.error(err))
-           // download imagem
-
-      setTimeout(() => {
-      const pixelmatch = require('pixelmatch');
-      var atual = PNG.sync.read(fs.readFileSync('./atual.png'))
-
-      var megabr = PNG.sync.read(fs.readFileSync('./megabr.png')),
-      {width, height} = atual,
-      diff = new PNG({width, height}),
-      difference = pixelmatch(atual.data, megabr.data, diff.data, width, height, {threshold: 0.1})
-      
-      var tamanho = megabr.height * megabr.width;
-      progtoda = tamanho - difference,
-      porcentagem = progtoda*100/tamanho.toFixed(1),
-      porcentagemverdadeira = porcentagem.toFixed(2),
-      progresso = '`'+`${args[1]}`+'` '+'**'+formatar(progtoda)+" / "+ formatar(tamanho)+" | "+formatar(difference)+" erros | "+porcentagemverdadeira + "% Completo** "
-      fs.writeFileSync('resultado_diff.png', PNG.sync.write(diff));
-    /*  var frase = 'hm', // simbolo de progresso / regresso / neutro
-      progresso_que_tivemos = 0, // numero de pixels que tivemos de progresso ou regresso
-      detalhe_bem_inutil = '/ ', //simbolo tipo +, -, /.
-      quem_ganhou_o_round = ' :flag_br:', //bandeira de quem ganhou o round. */
-/*      cu = fs.readFileSync('./stats/ultimos_erros.txt', 'utf-8')
-
-      if (cu > difference) { // teve progresso
-        frase = ':chart_with_upwards_trend:'
-        progresso_que_tivemos = cu-difference
-        detalhe_bem_inutil = '- '
-        quem_ganhou_o_round = ' :flag_br:'
-      }
-  
-      if (cu < difference) { // teve regresso
-        frase = ':chart_with_downwards_trend:'
-        progresso_que_tivemos = difference-cu
-        detalhe_bem_inutil = '+ '
-        quem_ganhou_o_round = ' :flag_fi:'
-      }
-  
-      if (cu == difference) { // neutro
-        frase =':handshake:'
-        detalhe_bem_inutil = ''
-        quem_ganhou_o_round = ' :flag_white:'
-      }
-
-      fs.writeFileSync('./stats/ultimos_erros.txt', difference) */
-
-      setTimeout(() => {
-      message.guild.channels.cache.get(channelToSend).send(progresso, {
-        files: [
-          "./atual.png",
-          "./resultado_diff.png"
-        ]
-      });
-    })
-    message.delete()
-  },5000)
-  }
-/*
-  if (cmd === 'ultimoserros') {
-    var fo = fs.readFileSync('./stats/ultimos_erros.txt', 'utf-8')
-    var g = formatar(fo)
-    if (!args[1]) return message.reply(`**Os status de ultimos erros são: `+g+`, para editar, digite /ultimoserros número**`)
-    if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
-    fs.writeFileSync("./stats/ultimos_erros.txt", args[1])
-    message.reply("**Os ultimos erros agora são "+formatar(args[1])+'!**')
-  } */
-    // pixels
 
     // mute temporario
     if (cmd === 'mutartemp') {
@@ -418,32 +245,6 @@ function saveDB(user, pixels) {
         message.channel.send(embed)
       }
 
-      if (cmd === 'addtemplate') {
-        if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
-        var hm = fs.readFileSync('./templates.json', 'utf8')
-        hm = JSON.parse(hm)
-        const Attach = message.attachments.array()
-        if (!args[1]) return message.reply("**Sua template não contém um nome!**")
-        if (!args[2]) return message.reply("**Indique o ID de um Canal para enviar Mensagens de Progresso!**")
-        if(hm.hasOwnProperty(`${args[1]}`)) return message.reply("**Esta template já existe!**")
-        var originalTemplate = Attach[0];
-        if (!originalTemplate) return message.reply("**Envie uma imagem da template original!**")
-        file2.set('templates.'+args[1]+'.originalTemplateUrl', originalTemplate.url);
-        file2.set('templates.'+args[1]+'.channelToSendMessages', args[2])
-        file2.save();
-        message.reply("**Template Adicionada: "+args[1]+"!**")
-      }
-
-      if (cmd === 'templates') {
-        var lmao = file2.get('templates')
-        var lamo2 = Object.keys(lmao)
-
-        const embed = new Discord.MessageEmbed()
-        .setTitle(`Templates (${lamo2.length})`)
-        .setDescription(lamo2)
-        message.reply(embed)
-      }
-
     if (cmd === 'backup') {
       if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
       if (message.author.bot) return;
@@ -451,10 +252,7 @@ function saveDB(user, pixels) {
       message.reply("**Backup enviado!**")
       message.author.send("**Backup dos Arquivos: Leaderboard.json, Kuruminha.js, Tags.json e ultimos_erros.txt!**", {
         files: [
-          "./leaderboard.json",
-          "./templates.json",
-          "./kuruminha.js",
-          "./stats/ultimos_erros.txt"
+          "./kuruminha.js"
         ]
       });
     }
@@ -570,10 +368,9 @@ function saveDB(user, pixels) {
       .setTitle('**Minha Lista de Comandos!**')
       .setThumbnail(message.author.displayAvatarURL())
       .addField('Moderação','`kick` `ban` `mutar` `mutartemp` `desmutar` `limpar`',true)
-      .addField('Staff','`setscore` `addtemplate` `template` `comparar`',true)
       .addField('Bot Owner','`backup` `token` `role` `restart` `eval`',true)
       .addField('Cálculos','`math` `timemath`',true)
-      .addField('Informação','`covid` `score` `owop` `info` `server-info` `top`',true)
+      .addField('Informação','`covid` `owop` `info` `server-info`',true)
       .addField('Miscelânea','`avatar` `poll` `ping` `traduzir` `textemoji`',true)
       .addField('Desativados','*ultimoserros* *asuma* *enix* *tag* *addtag*',true)
       .addField('Removidos','*hentai* *hentai-gif* *anal* *boobs* *porngif* *hentai-pussy* *jogando* *avatarbot* *slap* *cat* *waifu* *kiss*',true)
@@ -604,15 +401,10 @@ function saveDB(user, pixels) {
 
    if (cmd === 'info') {
      if(!member) { 
-      const authorid = message.author.id,
-      pxsauthor2 = file.get(authorid+'.pixels')
-      if (pxsauthor2 == undefined)  pxsauthor2 = 0;
-      const pxsfinal = formatar(pxsauthor2),
       msg = new Discord.MessageEmbed()
       .setColor(0x4287f5)
       .setDescription('**Informações de '+message.author.username+'**')
       .addField('ID do Usúario', message.author.id)
-      .addField('Pixels Colocados', pxsfinal)
       .addField('Conta Criada em', message.author.createdAt)
       .addField('Entrou  no Servidor em', message.member.joinedAt)
       .setThumbnail(message.author.displayAvatarURL())
@@ -621,12 +413,10 @@ function saveDB(user, pixels) {
       message.reply(msg)
      }
      const membroidd = member.id,
-    pxss = file.get(membroidd+'.pixels'),
     msg = new Discord.MessageEmbed()
      .setColor(0x4287f5)
      .setDescription('**Informações de ' + member.displayName + '**')
      .addField('ID do Usúario', member.user.id)
-     .addField('Pixels Colocados', formatar(pxss))
      .addField('Conta Criada em', member.user.createdAt)
      .addField('Entrou  no Servidor em', member.joinedAt)
      .setThumbnail(member.user.displayAvatarURL())
