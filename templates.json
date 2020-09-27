@@ -1,1 +1,8 @@
-{}
+{
+  "templates": {
+    "55tan": {
+      "originalTemplateUrl": "https://cdn.discordapp.com/attachments/721725554876874782/759821012719108136/unknown.png",
+      "channelToSendMessages": "755471482934788266"
+    }
+  }
+}

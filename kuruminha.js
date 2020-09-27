@@ -130,9 +130,11 @@ function saveDB(user, pixels) {
       if (message.author.bot) return;
       if (!args[1]) return message.reply("**Indique o Nome de uma Template!**")
        const Attach = message.attachments.array()
-       const PNG = require('pngjs').PNG;
        if (!Attach[0]) return message.reply("**Envie uma Imagem para eu comparar com a template selecionada atual!**")
-       if (Attach[1]) return message.reply("fgay.")
+       if (Attach[1]) return message.reply("só uma imagem, gay.")
+       const PNG = require('pngjs').PNG;
+       var requestedOriginalImage = file2.get('templates.'+args[1]+'.originalTemplateUrl')
+       if (!requestedOriginalImage) return message.reply("get stick bugged lol")
 
        // download imagem | https://www.npmjs.com/package/image-downloader
        const options = {
@@ -147,7 +149,6 @@ function saveDB(user, pixels) {
          .catch((err) => console.error(err))
       // download imagem
 
-      var requestedOriginalImage = file2.get('templates.'+args[1]+'.originalTemplateUrl')
       var channelToSend = file2.get('templates.'+args[1]+'.channelToSendMessages')
 
              // download imagem | https://www.npmjs.com/package/image-downloader
@@ -170,12 +171,16 @@ function saveDB(user, pixels) {
       var megabr = PNG.sync.read(fs.readFileSync('./megabr.png')),
       {width, height} = atual,
       diff = new PNG({width, height}),
-      difference = pixelmatch(atual.data, megabr.data, diff.data, width, height, {threshold: 0.1}),
-      tamanho = megabr.height * megabr.width,
+      difference = await pixelmatch(atual.data, megabr.data, diff.data, width, height, {threshold: 0.1})
+      .catch(err => {
+        console.error(err);
+      });
+      
+      var tamanho = megabr.height * megabr.width;
       progtoda = tamanho - difference,
       porcentagem = progtoda*100/tamanho.toFixed(1),
       porcentagemverdadeira = porcentagem.toFixed(2),
-      progresso = '**'+formatar(progtoda)+" / "+ formatar(tamanho)+" | "+formatar(difference)+" erros | "+porcentagemverdadeira + "% Completo** "
+      progresso = '`'+`${args[1]}`+'` '+'**'+formatar(progtoda)+" / "+ formatar(tamanho)+" | "+formatar(difference)+" erros | "+porcentagemverdadeira + "% Completo** "
       fs.writeFileSync('resultado_diff.png', PNG.sync.write(diff));
     /*  var frase = 'hm', // simbolo de progresso / regresso / neutro
       progresso_que_tivemos = 0, // numero de pixels que tivemos de progresso ou regresso
@@ -416,23 +421,6 @@ function saveDB(user, pixels) {
         message.channel.send(embed)
       }
 
-      //tempo
-      if (cmd === 'timemath') {
-        let argumentoss = args.slice(2).join(' ');
-        if (!argumentoss) return message.reply("**Defina uma data. Exemplo: Sep 1, 2020 00:00:00**")
-        var data = new Date(argumentoss).getTime(), // insira a data aqui < ---
-        data2 = new Date().getTime(), // pega o horário atual
-        distancia = data - data2, // verifica a distancia da data atual com a data marcada.
-        days = Math.floor(distancia / (1000 * 60 * 60 * 24)),
-        hours = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds = Math.floor((distancia % (1000 * 60)) / 1000);
-
-        message.reply(`**Faltam ${days} dias, ${hours} horas, ${minutes} minutos e ${seconds} segundos até ${argumentoss}**`)
-
-      }
-      // fim tempo
-
       if (cmd === 'addtemplate') {
         if (!message.guild.member(msgauthor).hasPermission("MANAGE_MESSAGES")) return message.reply("**Você não tem a permissão necessária para isso!**")
         var hm = fs.readFileSync('./templates.json', 'utf8')
@@ -459,55 +447,6 @@ function saveDB(user, pixels) {
         message.reply(embed)
       }
 
-      if (cmd === 'template') {
-        var hm2 = fs.readFileSync('./templates.json', 'utf8')
-        hm2 = JSON.parse(hm2)
-        if(!hm2.hasOwnProperty(`${args[1]}`)) return message.reply("**Esta template não existe!**")
-        if (!args[1]) return message.reply("**Digite o nome de uma template!**")
-        var respostinha = file2.get('templates.'+args[1]+'.originalTemplateUrl')
-        var respostinha2 = file2.get('templates.'+args[1]+'.channelToSendMessages')
-        const embed = new Discord.MessageEmbed()
-        .setTitle(`${args[1]}`)
-        .setImage(respostinha)
-        .addField(':newspaper: ID Canal de Updates',respostinha2)
-        message.reply(embed)
-      }
-
-  //inicio ping
-  if (cmd === 'ping') {
-    var author = '<@'+message.author+'>'
-    var startTime = Date.now();
-    message.reply('**Checando...**').then((message) => {
-      let endTime = Date.now();
-      let ping = Math.round(endTime - startTime)
-      message.edit(`${author} **Tempo de Resposta: ${ping}ms!**`)
-    })
-   }
- //fim ping
-                
-    // asuma trocar nome
-    /*if (cmd === 'asuma') {
-      let argus = args.slice(1).join(' ');
-     if (!argus) return message.reply("**Digite um nome!**")
-     if(argus.length>=32) return message.reply("**O Nome escolhido tem mais que 32 letras!**");
-      message.guild.members.cache.get('631964172866945084').setNickname(argus)
-      message.reply("**kkkkkkkkkkkkk asuma otario se fudeu, o nome dele agora é "+argus+"**")
-    } */
-    // fim comando de trocar o nome do asuma
-
-    // backup leaderboard json pq n sei como salvar em algum lugar kk
-    setInterval(() => {
-      var logchannel = message.guild.channels.cache.find(channels => channels.name == 'log');
-      logchannel.send("hora do backup")
-      client.guilds.cache.get('721121323446829128').members.cache.get('731625052222521346').send("**Backup**", {
-        files: [
-          "./leaderboard.json",
-          "./templates.json",
-          "./kuruminha.js",
-          "./stats/ultimos_erros.txt"
-        ]
-      });
-    },180000) // backup each 3 mins
     if (cmd === 'backup') {
       if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**")
       if (message.author.bot) return;
@@ -522,21 +461,8 @@ function saveDB(user, pixels) {
         ]
       });
     }
-    // backup leaderboard json pq n sei como salvar em algum lugar kk
-    
-    /* comando de pergunta DESATIVADO
-    const respostas = ['Claro que sim.','Com toda a certeza!','fap news','o zé sabe mt bem disso ai vei, pode perguntar pra ele','porra claro né vei mds ta óbvio isso ai bixo','tu é gay mano???','nada aver irmão','talvez vei','acho q ss mano','pergunta pro insano vei sla','pergunta pro asuma ou pro insano vei, os 2 tao sempre debatendo sobre isso por ai, eles devem saber :v','kk n sei n vei o matata deve saber','nn vei vsf kk','falso','true','^']
-    var resposta = respostas[Math.floor(Math.random() * respostas.length)];
-    if (cmd === 'pergunta') {
-      let reason = args.slice(2).join(' ');
-      if (!reason) return message.reply("**Digite uma Pergunta!**")
-      message.reply("**"+resposta+"**")
-    }
-     fim comando de pergunta DESATIVADO */
 
-    // owop
     if (cmd === 'owop') {
-
       fetch(`https://ourworldofpixels.com/api`).then(response=>response.json()) 
       .then(data=>{ 
         if (data.captchaEnabled == true) {
@@ -640,65 +566,6 @@ function saveDB(user, pixels) {
   }
   //avatar fim
 
-  if (cmd === 'restart') {
-    if (message.author.id != ownerid) return message.reply(":face_with_raised_eyebrow: **Apenas o Dono do Bot pode usar esse comando!**")
-    message.reply('**Reiniciando...**')
-    .then(client.destroy())
-    .then(client.login(process.env.token))
-    .then(message.reply("**Fui Reiniciada com Sucesso!** :icecream:"))
-  }
-
-    // inicio commando ban
-    if (cmd === 'ban') {
-    var banReason = args.slice(2).join(' ')
-    var logchannel = message.guild.channels.cache.find(channels => channels.name == 'log');
-    if (!message.guild.member(msgauthor).hasPermission("BAN_MEMBERS")) return message.reply("**Você não tem a permissão necessária para isso!**");
-    if (!member) return message.reply("**Não foi possível encontrar o usúario mencionado, ou você não mencionou alguém para banir!**")
-    if (!member.bannable) return message.reply("**Não foi possível banir o usúario, Ele têm um cargo maior, ou eu não tenho a permissão necessária.**");
-    if (!banReason) return message.reply("**Digite alguma razão para eu banir o usúario!**")
-    if (message.author.bot) return;
-    if (member.id == '731625052222521346') return;
-    member.ban({reason: banReason})
-    message.reply("<@"+member+"> **foi banido com sucesso!** `Motivo:` "+banReason)
-            .catch(error => message.reply('**Opss, ' + message.author + ' Eu não posso banir por causa de: **' + error));
-            const msg = new Discord.MessageEmbed()
-            .setColor(0xEE2A00)
-            .setAuthor('Banido')
-            .setDescription('<@' + member.user.id + '>')
-            .addField('Banido Por', '<@'+message.author.id+'>')
-            .addField('Motivo',banReason)
-            .setThumbnail(member.user.displayAvatarURL())
-            .setTimestamp()
-            .setFooter('Kuruminha');
-           logchannel.send(msg)
-    }
-    // fim commando ban
-
-        // inicio commando kick
-        if (cmd === 'kick') {
-          var kickReason = args.slice(2).join(' ')
-          var logchannel = message.guild.channels.cache.find(channels => channels.name == 'log');
-          if (!message.guild.member(msgauthor).hasPermission("ADMINISTRATOR")) return message.reply("**Você não tem a permissão necessária para isso!**");
-          if (!member) return message.reply("**Não foi possível encontrar o usúario mencionado, ou você não mencionou alguém para expulsar!**")
-          if (!member.bannable) return message.reply("**Não foi possível expulsar o usúario, Ele têm um cargo maior, ou eu não tenho a permissão necessária.**");
-          if (!kickReason) return message.reply("**Digite alguma razão para eu expulsar o usúario!**")
-          if (message.author.bot) return;
-          member.kick({reason: kickReason})
-          message.reply("<@"+member+"> **foi expulso com sucesso!** `Motivo:` "+kickReason)
-                  .catch(error => message.reply('**Opss, ' + message.author + ' Eu não posso expulsar esse usúario por causa de: **' + error));
-                  const msg = new Discord.MessageEmbed()
-                  .setColor(0xEE2A00)
-                  .setAuthor('Expulso')
-                  .setDescription('<@' + member.user.id + '>')
-                  .addField('Expulso Por', '<@'+message.author.id+'>')
-                  .addField('Motivo', kickReason)
-                  .setThumbnail(member.user.displayAvatarURL())
-                  .setTimestamp()
-                  .setFooter('Kuruminha');
-                 logchannel.send(msg)
-          }
-          // fim commando kick
-
     //inicio comando help
     if (cmd === 'help') {
       const msg = new Discord.MessageEmbed()
@@ -781,39 +648,6 @@ function saveDB(user, pixels) {
      }
    }
 
-   function emojify(str) {
-    if (typeof str === 'string') {
-      return Array.prototype.map.call(str, (e, i, a) => {
-        if (/[aA][bB]/.test(e+a[i+1])) {
-          return ':ab:';
-        } else if (/[oO]/.test(e)) {
-          return ':o2:';
-        } else if (/[aA]/.test(e)) {
-          return ':a:';
-        } else if (/[bB]/.test(e)) {
-          if (/[aA]/.test(a[i-1])) {
-            return;
-          } else {
-            return ':b:';
-          }
-        } else if (/[a-zA-Z]/.test(e)) {
-          return ':regional_indicator_' + e.toLowerCase() + ':'
-        } else {
-          return e;
-        }
-      }).join('\u200C');
-    } else {
-      throw new TypeError('argument is not a string');
-    }
-  } // https://github.com/robbie01/emojify.js/blob/master/emojify.js
-
-  if (cmd === 'textemoji') {
-    let msg = args.slice(2).join(' ')
-    if (!msg) return message.reply("**Escreva algo para transformar em emoji! Exemplo: ABC**")
-    var rsp = emojify(msg)
-    message.reply(`**${rsp}**`)
-  }
-
     // inicio limpar
     if (cmd === 'limpar') {
       var autor = message.author.username
@@ -882,7 +716,7 @@ client.on('guildBanRemove', function(guild, user) {
  logchannel.send(msg)
 })
 // fim log
-client.login(process.env.token)
+client.login('NzM1NjUwMTgxODczMjcwODg3.XxjVnw.5TUp82T51C8W3BB5TT2ARz_RjM8')
 
 var avatarz = function() {
   setInterval(() => {
