@@ -171,7 +171,7 @@ function saveDB(user, pixels) {
       var megabr = PNG.sync.read(fs.readFileSync('./megabr.png')),
       {width, height} = atual,
       diff = new PNG({width, height}),
-      difference = pixelmatch(atual.data, megabr.data, diff.data, width, height, {threshold: 0.1}).catch(err => { console.log(err) });
+      difference = pixelmatch(atual.data, megabr.data, diff.data, width, height, {threshold: 0.1})
       
       var tamanho = megabr.height * megabr.width;
       progtoda = tamanho - difference,
